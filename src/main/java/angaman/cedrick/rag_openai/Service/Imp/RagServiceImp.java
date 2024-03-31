@@ -1,5 +1,6 @@
-package angaman.cedrick.rag_openai;
+package angaman.cedrick.rag_openai.Service.Imp;
 
+import angaman.cedrick.rag_openai.Service.RagService;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -13,47 +14,33 @@ import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SpringBootApplication
-@PropertySource("classpath:Key/.env")
-public class RagOpenAiApplication {
-
+@Service
+public class RagServiceImp implements RagService {
     @Value("${spring.ai.openai.api-key}")
     private String apiKey;
 
-    public static void main(String[] args) {
-        SpringApplication.run(RagOpenAiApplication.class, args);
+    public RagServiceImp(VectorStore vectorStore, JdbcTemplate jdbcTemplate) {
+        this.vectorStore = vectorStore;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-//    @Bean
-    CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
-                                         @Value("classpath:pdfs/*") Resource[] resources) {
-        return args -> {
-//            textEmbedding(vectorStore, jdbcTemplate, resources);
-            String query = "dans les memoires donne moi toute les thematic utilisées";
-            askLlm(vectorStore, query);
+    VectorStore vectorStore;
+    JdbcTemplate jdbcTemplate;
 
 
-        };
-    }
-
-    private void askLlm(VectorStore vectorStore,String query) {
-//                    String query = "donne moi pour chaque memoire au format json, l'auteur du memoire, les membres du jury, un petit résumé du mémoire et les languages utilisées.";
-//                String query = "dans les memoires donne moi toute les thematic utilisées";
+    @Override
+    public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
-        System.out.println(documentList);
         String systemMessageTemplate = """
                 Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
                 Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
@@ -73,10 +60,12 @@ public class RagOpenAiApplication {
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
         String responseContent = response.getResult().getOutput().getContent();
-        System.out.println(responseContent);
+       return responseContent;
+
     }
 
-    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+    @Override
+    public void textEmbedding(Resource[] pdfResources) {
         jdbcTemplate.update("delete from vector_store");
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
         String content = "";
@@ -90,6 +79,6 @@ public class RagOpenAiApplication {
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
-    }
 
+    }
 }
