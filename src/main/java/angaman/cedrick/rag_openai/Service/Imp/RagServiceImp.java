@@ -1,6 +1,8 @@
 package angaman.cedrick.rag_openai.Service.Imp;
 
 import angaman.cedrick.rag_openai.Service.RagService;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -20,6 +22,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,7 +70,7 @@ public class RagServiceImp implements RagService {
     }
 
     @Override
-    public void textEmbedding(Resource[] pdfResources) {
+    public void textEmbeddingPdf(Resource[] pdfResources) {
         jdbcTemplate.update("delete from vector_store");
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
         String content = "";
@@ -81,5 +85,26 @@ public class RagServiceImp implements RagService {
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
 
+    }
+
+    @Override
+    public void textEmbeddingWord(Resource[] worldResources) {
+        jdbcTemplate.update("delete from vector_store");
+        String content = "";
+        for(Resource resource : worldResources){
+            try (InputStream inputStream = resource.getInputStream()) {
+                XWPFDocument document = new XWPFDocument(inputStream);
+                XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+                content += extractor.getText();
+            } catch (IOException e) {
+                // Gérer l'erreur d'une manière appropriée
+                e.printStackTrace();
+            }
+        }
+
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+        List<String> chunks = tokenTextSplitter.split(content,1000);
+        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+        vectorStore.accept(chunksDocs);
     }
 }

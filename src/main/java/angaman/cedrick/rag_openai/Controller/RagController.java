@@ -32,9 +32,15 @@ public class RagController {
         return new ObjectMapper().readValue(reponse, Map.class);
     }
 
-    @PostMapping("/fichier")
-    public ResponseEntity<Void> textEmbeddings(@RequestParam("files") Resource[] pdfResources) {
-        ragServiceImp.textEmbedding(pdfResources);
+    @PostMapping("/fichier/pdf")
+    public ResponseEntity<Void> textEmbeddingsPdf(@RequestParam("files") Resource[] pdfResources) {
+        ragServiceImp.textEmbeddingPdf(pdfResources);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/fichier/word")
+    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") Resource[] pdfResources) {
+        ragServiceImp.textEmbeddingWord(pdfResources);
         return ResponseEntity.ok().build();
     }
 }

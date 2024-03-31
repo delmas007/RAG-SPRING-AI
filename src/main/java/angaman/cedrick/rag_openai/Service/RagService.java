@@ -8,6 +8,9 @@ public interface RagService {
 
     String askLlm(String query);
 
-    void textEmbedding(Resource[] pdfResources);
+    void textEmbeddingPdf(Resource[] pdfResources);
+
+
+    void textEmbeddingWord(Resource[] worldResources);
 
 }

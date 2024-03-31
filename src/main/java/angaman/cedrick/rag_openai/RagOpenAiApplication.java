@@ -1,5 +1,7 @@
 package angaman.cedrick.rag_openai;
 
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -22,6 +24,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,11 +41,11 @@ public class RagOpenAiApplication {
         SpringApplication.run(RagOpenAiApplication.class, args);
     }
 
-//    @Bean
+    @Bean
     CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
-                                         @Value("classpath:pdfs/*") Resource[] resources) {
+                                         @Value("classpath:word/*") Resource[] resources) {
         return args -> {
-//            textEmbedding(vectorStore, jdbcTemplate, resources);
+            textEmbedding(vectorStore, jdbcTemplate, resources);
             String query = "dans les memoires donne moi toute les thematic utilisées";
             askLlm(vectorStore, query);
 
@@ -53,7 +57,6 @@ public class RagOpenAiApplication {
 //                    String query = "donne moi pour chaque memoire au format json, l'auteur du memoire, les membres du jury, un petit résumé du mémoire et les languages utilisées.";
 //                String query = "dans les memoires donne moi toute les thematic utilisées";
         List<Document> documentList = vectorStore.similaritySearch(query);
-        System.out.println(documentList);
         String systemMessageTemplate = """
                 Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
                 Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
@@ -76,20 +79,38 @@ public class RagOpenAiApplication {
         System.out.println(responseContent);
     }
 
-    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
-        jdbcTemplate.update("delete from vector_store");
-        PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
-        String content = "";
-        for(Resource resource : pdfResources){
-            PagePdfDocumentReader pagePdfDocumentReader = new PagePdfDocumentReader(resource,config);
-            List<Document> documentList = pagePdfDocumentReader.get();
-            content += documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"))+"\n";
+//    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+//        jdbcTemplate.update("delete from vector_store");
+//        PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
+//        String content = "";
+//        for(Resource resource : pdfResources){
+//            PagePdfDocumentReader pagePdfDocumentReader = new PagePdfDocumentReader(resource,config);
+//            List<Document> documentList = pagePdfDocumentReader.get();
+//            content += documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"))+"\n";
+//        }
+//
+//        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+//        List<String> chunks = tokenTextSplitter.split(content,1000);
+//        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+//        vectorStore.accept(chunksDocs);
+//    }
+private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+    jdbcTemplate.update("delete from vector_store");
+    String content = "";
+    for(Resource resource : pdfResources){
+        try (InputStream inputStream = resource.getInputStream()) {
+            XWPFDocument document = new XWPFDocument(inputStream);
+            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+            content += extractor.getText();
+        } catch (IOException e) {
+            // Gérer l'erreur d'une manière appropriée
+            e.printStackTrace();
         }
-
-        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-        List<String> chunks = tokenTextSplitter.split(content,1000);
-        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
     }
 
+    TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+    List<String> chunks = tokenTextSplitter.split(content,1000);
+    List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+    vectorStore.accept(chunksDocs);
+}
 }
