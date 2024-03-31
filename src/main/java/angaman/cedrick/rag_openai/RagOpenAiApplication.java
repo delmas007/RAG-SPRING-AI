@@ -2,6 +2,7 @@ package angaman.cedrick.rag_openai;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xslf.usermodel.*;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
@@ -46,11 +47,12 @@ public class RagOpenAiApplication {
 
     @Bean
     CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
-                                         @Value("classpath:excel/*") Resource[] resources) {
+                                         @Value("classpath:powerpoint/*") Resource[] resources) {
         return args -> {
             textEmbedding(vectorStore, jdbcTemplate, resources);
 //            String query = "dans les memoires donne moi toute les thematic utilisées";
-            String query = "donne les Marque";
+//            String query = "donne les Marque";
+            String query = "un resumer";
             askLlm(vectorStore, query);
 
 
@@ -118,24 +120,52 @@ public class RagOpenAiApplication {
 //    vectorStore.accept(chunksDocs);
 //}
 
+//    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+//        jdbcTemplate.update("delete from vector_store");
+//        String content = "";
+//        for(Resource resource : pdfResources){
+//            try (InputStream inputStream = resource.getInputStream()) {
+//                Workbook workbook = WorkbookFactory.create(inputStream);
+//                int numberOfSheets = workbook.getNumberOfSheets();
+//                for (int i = 0; i < numberOfSheets; i++) {
+//                    Sheet sheet = workbook.getSheetAt(i);
+//                    Iterator<Row> rowIterator = sheet.iterator();
+//                    while (((Iterator<?>) rowIterator).hasNext()) {
+//                        Row row = rowIterator.next();
+//                        Iterator<Cell> cellIterator = row.cellIterator();
+//                        while (cellIterator.hasNext()) {
+//                            Cell cell = cellIterator.next();
+//                            content += cell.toString() + " ";
+//                        }
+//                        content += "\n";
+//                    }
+//                }
+//            } catch (IOException e) {
+//                // Gérer l'erreur d'une manière appropriée
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+//        List<String> chunks = tokenTextSplitter.split(content, 1000);
+//        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+//        vectorStore.accept(chunksDocs);
+//    }
+
     private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
         jdbcTemplate.update("delete from vector_store");
         String content = "";
-        for(Resource resource : pdfResources){
+        for (Resource resource : pdfResources) {
             try (InputStream inputStream = resource.getInputStream()) {
-                Workbook workbook = WorkbookFactory.create(inputStream);
-                int numberOfSheets = workbook.getNumberOfSheets();
-                for (int i = 0; i < numberOfSheets; i++) {
-                    Sheet sheet = workbook.getSheetAt(i);
-                    Iterator<Row> rowIterator = sheet.iterator();
-                    while (((Iterator<?>) rowIterator).hasNext()) {
-                        Row row = rowIterator.next();
-                        Iterator<Cell> cellIterator = row.cellIterator();
-                        while (cellIterator.hasNext()) {
-                            Cell cell = cellIterator.next();
-                            content += cell.toString() + " ";
+                XMLSlideShow ppt = new XMLSlideShow(inputStream);
+                for (XSLFSlide slide : ppt.getSlides()) {
+                    for (XSLFShape shape : slide.getShapes()) {
+                        if (shape instanceof XSLFTextShape) {
+                            XSLFTextShape textShape = (XSLFTextShape) shape;
+                            for (XSLFTextParagraph paragraph : textShape) {
+                                content += paragraph.getText() + "\n";
+                            }
                         }
-                        content += "\n";
                     }
                 }
             } catch (IOException e) {

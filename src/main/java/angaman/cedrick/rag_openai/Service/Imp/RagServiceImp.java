@@ -2,6 +2,7 @@ package angaman.cedrick.rag_openai.Service.Imp;
 
 import angaman.cedrick.rag_openai.Service.RagService;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xslf.usermodel.*;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
@@ -142,5 +143,35 @@ public class RagServiceImp implements RagService {
         List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
     }
+
+    @Override
+    public void textEmbeddingPowerpoint(Resource[] PowerpointResources) {
+        jdbcTemplate.update("delete from vector_store");
+        String content = "";
+        for (Resource resource : PowerpointResources) {
+            try (InputStream inputStream = resource.getInputStream()) {
+                XMLSlideShow ppt = new XMLSlideShow(inputStream);
+                for (XSLFSlide slide : ppt.getSlides()) {
+                    for (XSLFShape shape : slide.getShapes()) {
+                        if (shape instanceof XSLFTextShape) {
+                            XSLFTextShape textShape = (XSLFTextShape) shape;
+                            for (XSLFTextParagraph paragraph : textShape) {
+                                content += paragraph.getText() + "\n";
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                // Gérer l'erreur d'une manière appropriée
+                e.printStackTrace();
+            }
+        }
+
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+        List<String> chunks = tokenTextSplitter.split(content, 1000);
+        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+        vectorStore.accept(chunksDocs);
+    }
+
 }
 

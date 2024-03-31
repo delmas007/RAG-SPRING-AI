@@ -49,4 +49,10 @@ public class RagController {
         ragServiceImp.textEmbeddingExcel(excelResources);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/fichier/powerpoint")
+    public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") Resource[] powerpointlResources) {
+        ragServiceImp.textEmbeddingPowerpoint(powerpointlResources);
+        return ResponseEntity.ok().build();
+    }
 }

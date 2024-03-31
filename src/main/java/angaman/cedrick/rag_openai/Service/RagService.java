@@ -15,4 +15,6 @@ public interface RagService {
 
     void textEmbeddingExcel(Resource[] excelResources);
 
+    void textEmbeddingPowerpoint(Resource[] PowerpointResources);
+
 }
