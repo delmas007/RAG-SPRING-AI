@@ -41,6 +41,7 @@ public class RagServiceImp implements RagService {
     @Override
     public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
+
         String systemMessageTemplate = """
                 Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
                 Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.

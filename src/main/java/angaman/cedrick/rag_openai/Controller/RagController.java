@@ -4,6 +4,7 @@ import angaman.cedrick.rag_openai.Service.Imp.RagServiceImp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,8 +33,8 @@ public class RagController {
     }
 
     @PostMapping("/fichier")
-    public Void textEmbeddings(Resource[] pdfResources){
+    public ResponseEntity<Void> textEmbeddings(@RequestParam("files") Resource[] pdfResources) {
         ragServiceImp.textEmbedding(pdfResources);
-        return null;
+        return ResponseEntity.ok().build();
     }
 }
