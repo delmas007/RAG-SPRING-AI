@@ -1,6 +1,7 @@
 package angaman.cedrick.rag_openai.Service.Imp;
 
 import angaman.cedrick.rag_openai.Service.RagService;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -107,4 +109,38 @@ public class RagServiceImp implements RagService {
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
     }
+
+    @Override
+    public void textEmbeddingExcel(Resource[] excelResources) {
+        jdbcTemplate.update("delete from vector_store");
+        String content = "";
+        for(Resource resource : excelResources){
+            try (InputStream inputStream = resource.getInputStream()) {
+                Workbook workbook = WorkbookFactory.create(inputStream);
+                int numberOfSheets = workbook.getNumberOfSheets();
+                for (int i = 0; i < numberOfSheets; i++) {
+                    Sheet sheet = workbook.getSheetAt(i);
+                    Iterator<Row> rowIterator = sheet.iterator();
+                    while (((Iterator<?>) rowIterator).hasNext()) {
+                        Row row = rowIterator.next();
+                        Iterator<Cell> cellIterator = row.cellIterator();
+                        while (cellIterator.hasNext()) {
+                            Cell cell = cellIterator.next();
+                            content += cell.toString() + " ";
+                        }
+                        content += "\n";
+                    }
+                }
+            } catch (IOException e) {
+                // Gérer l'erreur d'une manière appropriée
+                e.printStackTrace();
+            }
+        }
+
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+        List<String> chunks = tokenTextSplitter.split(content, 1000);
+        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+        vectorStore.accept(chunksDocs);
+    }
 }
+

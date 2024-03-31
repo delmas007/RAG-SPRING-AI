@@ -39,8 +39,14 @@ public class RagController {
     }
 
     @PostMapping("/fichier/word")
-    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") Resource[] pdfResources) {
-        ragServiceImp.textEmbeddingWord(pdfResources);
+    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") Resource[] worldResources) {
+        ragServiceImp.textEmbeddingWord(worldResources);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/fichier/excel")
+    public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") Resource[] excelResources) {
+        ragServiceImp.textEmbeddingExcel(excelResources);
         return ResponseEntity.ok().build();
     }
 }

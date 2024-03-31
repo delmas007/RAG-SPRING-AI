@@ -1,5 +1,7 @@
 package angaman.cedrick.rag_openai;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.ai.chat.ChatResponse;
@@ -26,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,10 +46,11 @@ public class RagOpenAiApplication {
 
     @Bean
     CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
-                                         @Value("classpath:word/*") Resource[] resources) {
+                                         @Value("classpath:excel/*") Resource[] resources) {
         return args -> {
             textEmbedding(vectorStore, jdbcTemplate, resources);
-            String query = "dans les memoires donne moi toute les thematic utilisées";
+//            String query = "dans les memoires donne moi toute les thematic utilisées";
+            String query = "donne les Marque";
             askLlm(vectorStore, query);
 
 
@@ -94,23 +98,55 @@ public class RagOpenAiApplication {
 //        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
 //        vectorStore.accept(chunksDocs);
 //    }
-private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
-    jdbcTemplate.update("delete from vector_store");
-    String content = "";
-    for(Resource resource : pdfResources){
-        try (InputStream inputStream = resource.getInputStream()) {
-            XWPFDocument document = new XWPFDocument(inputStream);
-            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
-            content += extractor.getText();
-        } catch (IOException e) {
-            // Gérer l'erreur d'une manière appropriée
-            e.printStackTrace();
-        }
-    }
+//private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+//    jdbcTemplate.update("delete from vector_store");
+//    String content = "";
+//    for(Resource resource : pdfResources){
+//        try (InputStream inputStream = resource.getInputStream()) {
+//            XWPFDocument document = new XWPFDocument(inputStream);
+//            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+//            content += extractor.getText();
+//        } catch (IOException e) {
+//            // Gérer l'erreur d'une manière appropriée
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+//    List<String> chunks = tokenTextSplitter.split(content,1000);
+//    List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+//    vectorStore.accept(chunksDocs);
+//}
 
-    TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-    List<String> chunks = tokenTextSplitter.split(content,1000);
-    List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-    vectorStore.accept(chunksDocs);
-}
+    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
+        jdbcTemplate.update("delete from vector_store");
+        String content = "";
+        for(Resource resource : pdfResources){
+            try (InputStream inputStream = resource.getInputStream()) {
+                Workbook workbook = WorkbookFactory.create(inputStream);
+                int numberOfSheets = workbook.getNumberOfSheets();
+                for (int i = 0; i < numberOfSheets; i++) {
+                    Sheet sheet = workbook.getSheetAt(i);
+                    Iterator<Row> rowIterator = sheet.iterator();
+                    while (((Iterator<?>) rowIterator).hasNext()) {
+                        Row row = rowIterator.next();
+                        Iterator<Cell> cellIterator = row.cellIterator();
+                        while (cellIterator.hasNext()) {
+                            Cell cell = cellIterator.next();
+                            content += cell.toString() + " ";
+                        }
+                        content += "\n";
+                    }
+                }
+            } catch (IOException e) {
+                // Gérer l'erreur d'une manière appropriée
+                e.printStackTrace();
+            }
+        }
+
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+        List<String> chunks = tokenTextSplitter.split(content, 1000);
+        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+        vectorStore.accept(chunksDocs);
+    }
 }

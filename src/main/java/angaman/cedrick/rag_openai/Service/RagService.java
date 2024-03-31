@@ -13,4 +13,6 @@ public interface RagService {
 
     void textEmbeddingWord(Resource[] worldResources);
 
+    void textEmbeddingExcel(Resource[] excelResources);
+
 }
