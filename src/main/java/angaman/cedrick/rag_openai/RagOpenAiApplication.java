@@ -38,43 +38,55 @@ public class RagOpenAiApplication {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,@Value("classpath:MEMOIRE_PFE_ANGAMAN_BROU_CEDRICK_DELMAS.pdf") Resource resource) {
+    CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
+                                         @Value("classpath:pdfs/*") Resource[] resources) {
         return args -> {
-            //textEmbedding(vectorStore, jdbcTemplate, resource);
-
-            String query = "donne moi au format json, l'auteur du memoire, les membres du jury, un petit résumé du mémoire et les technologies utilisées.";
-            List<Document> documentList = vectorStore.similaritySearch(query);
-            String systemMessageTemplate = """
-                    Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
-                    Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
-                    CONTEXTE:
-                         {CONTEXTE}
-                    """;
-            Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
-                    .createMessage(Map.of("CONTEXTE",documentList));
-            UserMessage userMessage = new UserMessage(query);
-            Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
-            OpenAiApi aiApi = new OpenAiApi(apiKey);
-            OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-                    .withModel("gpt-4-turbo-preview")
-                    .withTemperature(0F)
-                    .withMaxTokens(800)
-                    .build();
-            OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
-            ChatResponse response = openAiChatClient.call(prompt);
-            String responseContent = response.getResult().getOutput().getContent();
-            System.out.println(responseContent);
+//            textEmbedding(vectorStore, jdbcTemplate, resources);
+            String query = "dans les memoires donne moi toute les thematic utilisées";
+            askLlm(vectorStore, query);
 
 
         };
     }
 
-    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource resource) {
+    private void askLlm(VectorStore vectorStore,String query) {
+        //            String query = "donne moi pour chaque memoire au format json, l'auteur du memoire, " +
+        //                    "les membres du jury, un petit résumé du mémoire et les languages utilisées.";
+        //        String query = "dans les memoires donne moi toute les thematic utilisées";
+        List<Document> documentList = vectorStore.similaritySearch(query);
+        System.out.println(documentList);
+        String systemMessageTemplate = """
+                Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
+                Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
+                CONTEXTE:
+                     {CONTEXTE}
+                """;
+        Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
+                .createMessage(Map.of("CONTEXTE",documentList));
+        UserMessage userMessage = new UserMessage(query);
+        Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
+        OpenAiApi aiApi = new OpenAiApi(apiKey);
+        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
+                .withModel("gpt-4-turbo-preview")
+                .withTemperature(0F)
+                .withMaxTokens(800)
+                .build();
+        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
+        ChatResponse response = openAiChatClient.call(prompt);
+        String responseContent = response.getResult().getOutput().getContent();
+        System.out.println(responseContent);
+    }
+
+    private static void textEmbedding(VectorStore vectorStore, JdbcTemplate jdbcTemplate, Resource[] pdfResources) {
         jdbcTemplate.update("delete from vector_store");
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
-        PagePdfDocumentReader pagePdfDocumentReader = new PagePdfDocumentReader(resource,config);
-        List<Document> documentList = pagePdfDocumentReader.get();
-        String content = documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"));
+        String content = "";
+        for(Resource resource : pdfResources){
+            PagePdfDocumentReader pagePdfDocumentReader = new PagePdfDocumentReader(resource,config);
+            List<Document> documentList = pagePdfDocumentReader.get();
+            content += documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"))+"\n";
+        }
+
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
