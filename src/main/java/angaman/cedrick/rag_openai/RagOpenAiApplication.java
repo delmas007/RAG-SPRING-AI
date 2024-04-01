@@ -45,7 +45,7 @@ public class RagOpenAiApplication {
         SpringApplication.run(RagOpenAiApplication.class, args);
     }
 
-    @Bean
+//    @Bean
     CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
                                          @Value("classpath:powerpoint/*") Resource[] resources) {
         return args -> {
