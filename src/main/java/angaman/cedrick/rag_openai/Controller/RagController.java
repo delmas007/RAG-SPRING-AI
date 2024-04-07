@@ -101,6 +101,11 @@ public class RagController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/image")
+    public String Image(@RequestParam("prompt") String prompt){
+        return ragServiceImp.Image(prompt);
+    }
+
 
 //    @PostMapping("/fichier/word")
 //    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") Resource[] worldResources) {

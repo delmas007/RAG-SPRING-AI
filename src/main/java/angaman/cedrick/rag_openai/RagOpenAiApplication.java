@@ -11,9 +11,14 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -45,18 +50,40 @@ public class RagOpenAiApplication {
         SpringApplication.run(RagOpenAiApplication.class, args);
     }
 
-//    @Bean
+//        @Bean
     CommandLineRunner commandLineRunner (VectorStore vectorStore, JdbcTemplate jdbcTemplate,
                                          @Value("classpath:powerpoint/*") Resource[] resources) {
         return args -> {
-            textEmbedding(vectorStore, jdbcTemplate, resources);
+//            textEmbedding(vectorStore, jdbcTemplate, resources);
 //            String query = "dans les memoires donne moi toute les thematic utilisées";
 //            String query = "donne les Marque";
-            String query = "un resumer";
-            askLlm(vectorStore, query);
+//            String query = "un resumer";
+//            askLlm(vectorStore, query);
+            String prompt = "A light cream colored mini golden doodle";
+            extracted(prompt);
 
 
         };
+    }
+
+    private void extracted(String prompt) {
+        System.out.println("0");
+        OpenAiImageApi api = new OpenAiImageApi(apiKey);
+        OpenAiImageClient openaiImageClient = new OpenAiImageClient(api);
+        System.out.println("00");
+
+        ImageResponse response = openaiImageClient.call(
+                new ImagePrompt(prompt,
+                        OpenAiImageOptions.builder()
+                                .withQuality("hd")
+                                .withN(1)
+                                .withHeight(1024)
+                                .withWidth(1024).build())
+
+        );
+        System.out.println("1");
+        System.out.println(response.getResult().getOutput().getUrl());
+        System.out.println("2");
     }
 
     private void askLlm(VectorStore vectorStore,String query) {

@@ -11,9 +11,14 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -171,6 +176,23 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content, 1000);
         List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+    }
+
+    @Override
+    public String Image(String prompt) {
+        OpenAiImageApi api = new OpenAiImageApi(apiKey);
+        OpenAiImageClient openaiImageClient = new OpenAiImageClient(api);
+
+        ImageResponse response = openaiImageClient.call(
+                new ImagePrompt(prompt,
+                        OpenAiImageOptions.builder()
+                                .withQuality("hd")
+                                .withN(1)
+                                .withHeight(1024)
+                                .withWidth(1024).build())
+
+        );
+        return response.getResult().getOutput().getUrl();
     }
 
 }
