@@ -34,7 +34,12 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
+
+//import org.bson.Document;
+import org.bson.json.JsonMode;
+import org.bson.json.JsonWriterSettings;
 
 @Service
 public class RagServiceImp implements RagService {
@@ -50,13 +55,39 @@ public class RagServiceImp implements RagService {
     JdbcTemplate jdbcTemplate;
 
 
+//    @Override
+//    public String askLlm(String query) {
+//        List<Document> documentList = vectorStore.similaritySearch(query);
+//
+//        String systemMessageTemplate = """
+//                Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
+//                Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
+//                CONTEXTE:
+//                     {CONTEXTE}
+//                """;
+//        Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
+//                .createMessage(Map.of("CONTEXTE",documentList));
+//        UserMessage userMessage = new UserMessage(query);
+//        Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
+//        OpenAiApi aiApi = new OpenAiApi(apiKey);
+//        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
+//                .withModel("gpt-4-turbo-preview")
+//                .withTemperature(0F)
+//                .withMaxTokens(800)
+//                .build();
+//        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
+//        ChatResponse response = openAiChatClient.call(prompt);
+//        String responseContent = response.getResult().getOutput().getContent();
+//       return responseContent;
+//
+//    }
+
     @Override
     public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
 
         String systemMessageTemplate = """
-                Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
-                Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
+                Donne la requête MongoDB de la question
                 CONTEXTE:
                      {CONTEXTE}
                 """;
@@ -73,7 +104,7 @@ public class RagServiceImp implements RagService {
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
         String responseContent = response.getResult().getOutput().getContent();
-       return responseContent;
+        return responseContent;
 
     }
 
@@ -114,6 +145,45 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+    }
+
+    public void textEmbeddingBSON(Resource[] worldResources) throws IOException {
+
+        jdbcTemplate.update("delete from vector_store");
+        StringBuilder contentBuilder = new StringBuilder();
+
+//        for (Resource resource : worldResources) {
+//            try (InputStream inputStream = resource.getInputStream()) {
+//                // Lire le fichier BSON en tant que Document
+//                org.bson.Document  bsonDocument = org.bson.Document.parse(inputStream.toString());
+//                // Convertir le Document BSON en JSON pour le traitement
+//                String json = bsonDocument.toJson(JsonWriterSettings.builder().outputMode(JsonMode.SHELL).build());
+//                contentBuilder.append(json);
+//            } catch (IOException e) {
+//                // Gérer l'erreur d'une manière appropriée
+//                e.printStackTrace();
+//            }
+//        }
+        for (Resource resource : worldResources) {
+            InputStream inputStream = resource.getInputStream();
+            // Utilisez un Scanner pour lire le contenu de l'InputStream
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            String content = scanner.hasNext() ? scanner.next() : "";
+
+            // Utilisez la classe Document.parse(String) pour parser le JSON
+            org.bson.Document bsonDocument = org.bson.Document.parse(content);
+
+            // Convertir le Document BSON en JSON pour le traitement
+            String json = bsonDocument.toJson(JsonWriterSettings.builder().outputMode(JsonMode.SHELL).build());
+            contentBuilder.append(json);
+
+            String contente = contentBuilder.toString();
+
+            TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+            List<String> chunks = tokenTextSplitter.split(contente, 1000);
+            List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+            vectorStore.accept(chunksDocs);
+        }
     }
 
     @Override

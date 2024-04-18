@@ -56,6 +56,22 @@ public class RagController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/fichier/bson")
+    public ResponseEntity<Void> textEmbeddingBSON(@RequestParam("files") MultipartFile[] pdfFiles) throws IOException {
+        List<Resource> resources = Arrays.asList(pdfFiles)
+                .stream()
+                .map(file -> {
+                    try {
+                        return new ByteArrayResource(file.getBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+        ragServiceImp.textEmbeddingBSON(((List<?>) resources).toArray(new Resource[0]));
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/fichier/word")
     public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles) {
         List<Resource> resources = Arrays.stream(wordFiles)
