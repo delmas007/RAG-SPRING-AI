@@ -29,8 +29,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,39 +57,13 @@ public class RagServiceImp implements RagService {
     JdbcTemplate jdbcTemplate;
 
 
-//    @Override
-//    public String askLlm(String query) {
-//        List<Document> documentList = vectorStore.similaritySearch(query);
-//
-//        String systemMessageTemplate = """
-//                Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
-//                Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
-//                CONTEXTE:
-//                     {CONTEXTE}
-//                """;
-//        Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
-//                .createMessage(Map.of("CONTEXTE",documentList));
-//        UserMessage userMessage = new UserMessage(query);
-//        Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
-//        OpenAiApi aiApi = new OpenAiApi(apiKey);
-//        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-//                .withModel("gpt-4-turbo-preview")
-//                .withTemperature(0F)
-//                .withMaxTokens(800)
-//                .build();
-//        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
-//        ChatResponse response = openAiChatClient.call(prompt);
-//        String responseContent = response.getResult().getOutput().getContent();
-//       return responseContent;
-//
-//    }
-
     @Override
     public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
 
         String systemMessageTemplate = """
-                Donne la requête MongoDB de la question
+                Répondez à la question, au format json mais n'ajoute pas ```json   ``` ,en vous basant uniquement sur le CONTEXTE fourni.
+                Si la réponse n'est pas trouvée dans le contexte, répondez ' je ne sais pas '.
                 CONTEXTE:
                      {CONTEXTE}
                 """;
@@ -104,9 +80,35 @@ public class RagServiceImp implements RagService {
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
         String responseContent = response.getResult().getOutput().getContent();
-        return responseContent;
+       return responseContent;
 
     }
+
+//    @Override
+//    public String askLlm(String query) {
+//        List<Document> documentList = vectorStore.similaritySearch(query);
+//
+//        String systemMessageTemplate = """
+//                Donne la requête MongoDB de la question
+//                CONTEXTE:
+//                     {CONTEXTE}
+//                """;
+//        Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
+//                .createMessage(Map.of("CONTEXTE",documentList));
+//        UserMessage userMessage = new UserMessage(query);
+//        Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
+//        OpenAiApi aiApi = new OpenAiApi(apiKey);
+//        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
+//                .withModel("gpt-4-turbo-preview")
+//                .withTemperature(0F)
+//                .withMaxTokens(800)
+//                .build();
+//        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
+//        ChatResponse response = openAiChatClient.call(prompt);
+//        String responseContent = response.getResult().getOutput().getContent();
+//        return responseContent;
+//
+//    }
 
     @Override
     public void textEmbeddingPdf(Resource[] pdfResources) {
@@ -146,6 +148,8 @@ public class RagServiceImp implements RagService {
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
     }
+
+
 
     public void textEmbeddingBSON(Resource[] worldResources) throws IOException {
 
@@ -219,6 +223,8 @@ public class RagServiceImp implements RagService {
         vectorStore.accept(chunksDocs);
     }
 
+
+
     @Override
     public void textEmbeddingPowerpoint(Resource[] PowerpointResources) {
         jdbcTemplate.update("delete from vector_store");
@@ -263,6 +269,26 @@ public class RagServiceImp implements RagService {
 
         );
         return response.getResult().getOutput().getUrl();
+    }
+
+    public void textEmbeddingTxt(Resource[] txtResources) {
+        jdbcTemplate.update("delete from vector_store"); // Effacer l'ancien contenu
+        StringBuilder content = new StringBuilder();
+
+        // Lire le contenu des fichiers TXT
+        for (Resource resource : txtResources) {
+            try (InputStream inputStream = resource.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) { // Lire ligne par ligne
+                    content.append(line).append("\n"); // Ajouter au contenu
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace(); // Gérer l'erreur de lecture du fichier
+            }
+        }
     }
 
 }

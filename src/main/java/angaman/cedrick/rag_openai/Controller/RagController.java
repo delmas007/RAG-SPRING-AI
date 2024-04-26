@@ -102,6 +102,25 @@ public class RagController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/fichier/txt")
+    public ResponseEntity<Void> textEmbeddingsTxt(@RequestParam("files") MultipartFile[] txtFiles) {
+        List<Resource> resources = Arrays.stream(txtFiles)
+                .map(file -> {
+                    try {
+                        return new ByteArrayResource(file.getBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // Appeler la fonction pour traiter les fichiers TXT
+        ragServiceImp.textEmbeddingTxt(resources.toArray(new Resource[0]));
+
+        // Retourner une réponse HTTP 200 (OK)
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/fichier/powerpoint")
     public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") MultipartFile[] powerpointFiles) {
         List<Resource> resources = Arrays.stream(powerpointFiles)
