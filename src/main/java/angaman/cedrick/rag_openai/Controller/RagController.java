@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public class RagController {
 
 
 
-    @PostMapping("/fichier/pdf")
+    @PostMapping(value = "/fichier/pdf",consumes = {"multipart/form-data"})
     public ResponseEntity<Void> textEmbeddingsPdf(@RequestParam("files") MultipartFile[] pdfFiles) {
         List<Resource> resources = Arrays.asList(pdfFiles)
                 .stream()
@@ -73,19 +74,29 @@ public class RagController {
     }
 
     @PostMapping("/fichier/word")
-    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles) {
-        List<Resource> resources = Arrays.stream(wordFiles)
-                .map(file -> {
-                    try {
-                        return new ByteArrayResource(file.getBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
-        ragServiceImp.textEmbeddingWord(resources.toArray(new Resource[0]));
-        return ResponseEntity.ok().build();
-    }
+        public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles) {
+            if (wordFiles == null || wordFiles.length == 0) {
+                throw new RuntimeException("No files found!"); // Gérer les erreurs si les fichiers sont absents
+
+            }
+
+            // Traitez les fichiers reçus
+            List<Resource> resources = Arrays.stream(wordFiles)
+                    .map(file -> {
+                        try {
+                            return new ByteArrayResource(file.getBytes());
+
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error processing file", e); // Gérer les erreurs
+                        }
+                    })
+                    .collect(Collectors.toList());
+            ragServiceImp.textEmbeddingWord(resources.toArray(new Resource[0]));
+
+        return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).build();
+        }
+
+
 
     @PostMapping("/fichier/excel")
     public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") MultipartFile[] excelFiles) {
