@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,9 +29,17 @@ public class RagController {
 
     RagServiceImp ragServiceImp;
 
-    @GetMapping("/rag")
-    public String rag(@RequestParam(name = "query") String query){
-        return ragServiceImp.askLlm(query);
+//    @GetMapping("/rag/")
+//    public ResponseEntity<String> rag(@RequestParam(name = "query") String query) {
+//        String response = ragServiceImp.askLlm(query);
+//        return ResponseEntity.ok(response);
+//    }
+
+    @GetMapping("/rag/")
+    public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", ragServiceImp.askLlm(query));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/ragJson")
@@ -41,7 +50,7 @@ public class RagController {
 
 
 
-    @PostMapping(value = "/fichier/pdf",consumes = {"multipart/form-data"})
+    @PostMapping(value = "/fichier/.pdf")
     public ResponseEntity<Void> textEmbeddingsPdf(@RequestParam("files") MultipartFile[] pdfFiles) {
         List<Resource> resources = Arrays.asList(pdfFiles)
                 .stream()
@@ -73,7 +82,7 @@ public class RagController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/fichier/word")
+    @PostMapping("/fichier/.docx")
         public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles) {
             if (wordFiles == null || wordFiles.length == 0) {
                 throw new RuntimeException("No files found!"); // Gérer les erreurs si les fichiers sont absents
@@ -98,7 +107,7 @@ public class RagController {
 
 
 
-    @PostMapping("/fichier/excel")
+    @PostMapping("/fichier/.xlsx")
     public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") MultipartFile[] excelFiles) {
         List<Resource> resources = Arrays.stream(excelFiles)
                 .map(file -> {
@@ -132,7 +141,7 @@ public class RagController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/fichier/powerpoint")
+    @PostMapping("/fichier/.pptx")
     public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") MultipartFile[] powerpointFiles) {
         List<Resource> resources = Arrays.stream(powerpointFiles)
                 .map(file -> {
