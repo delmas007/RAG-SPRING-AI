@@ -45,23 +45,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>5.0.1</version>
-        </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>3.12.14</version>
-        </dependency>
-
-
-
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
         <dependency>
             <groupId>org.apache.poi</groupId>

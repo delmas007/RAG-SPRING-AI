@@ -39,9 +39,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-//import org.bson.Document;
-import org.bson.json.JsonMode;
-import org.bson.json.JsonWriterSettings;
+
 
 @Service
 public class RagServiceImp implements RagService {
@@ -162,45 +160,6 @@ public class RagServiceImp implements RagService {
     }
 
 
-
-    public void textEmbeddingBSON(Resource[] worldResources) throws IOException {
-
-        jdbcTemplate.update("delete from vector_store");
-        StringBuilder contentBuilder = new StringBuilder();
-
-//        for (Resource resource : worldResources) {
-//            try (InputStream inputStream = resource.getInputStream()) {
-//                // Lire le fichier BSON en tant que Document
-//                org.bson.Document  bsonDocument = org.bson.Document.parse(inputStream.toString());
-//                // Convertir le Document BSON en JSON pour le traitement
-//                String json = bsonDocument.toJson(JsonWriterSettings.builder().outputMode(JsonMode.SHELL).build());
-//                contentBuilder.append(json);
-//            } catch (IOException e) {
-//                // Gérer l'erreur d'une manière appropriée
-//                e.printStackTrace();
-//            }
-//        }
-        for (Resource resource : worldResources) {
-            InputStream inputStream = resource.getInputStream();
-            // Utilisez un Scanner pour lire le contenu de l'InputStream
-            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-            String content = scanner.hasNext() ? scanner.next() : "";
-
-            // Utilisez la classe Document.parse(String) pour parser le JSON
-            org.bson.Document bsonDocument = org.bson.Document.parse(content);
-
-            // Convertir le Document BSON en JSON pour le traitement
-            String json = bsonDocument.toJson(JsonWriterSettings.builder().outputMode(JsonMode.SHELL).build());
-            contentBuilder.append(json);
-
-            String contente = contentBuilder.toString();
-
-            TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-            List<String> chunks = tokenTextSplitter.split(contente, 1000);
-            List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-            vectorStore.accept(chunksDocs);
-        }
-    }
 
     @Override
     public void textEmbeddingExcel(Resource[] excelResources) {

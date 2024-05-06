@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +22,4 @@ public class vector_store {
 
     @Column(name = "content")
     private String content;
-
-    @Column(name = "embedding")
-    private Integer embedding;
 }
