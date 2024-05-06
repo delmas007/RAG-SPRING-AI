@@ -1,5 +1,6 @@
 package angaman.cedrick.rag_openai.Service.Imp;
 
+import angaman.cedrick.rag_openai.Repository.VectorRepository;
 import angaman.cedrick.rag_openai.Service.RagService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xslf.usermodel.*;
@@ -46,13 +47,15 @@ public class RagServiceImp implements RagService {
     @Value("${spring.ai.openai.api-key}")
     private String apiKey;
 
-    public RagServiceImp(VectorStore vectorStore, JdbcTemplate jdbcTemplate) {
+    public RagServiceImp(VectorStore vectorStore, JdbcTemplate jdbcTemplate,VectorRepository vectorRepository) {
         this.vectorStore = vectorStore;
         this.jdbcTemplate = jdbcTemplate;
+        this.vectorRepository = vectorRepository;
     }
 
     VectorStore vectorStore;
     JdbcTemplate jdbcTemplate;
+    VectorRepository vectorRepository;
 
 
     @Override
@@ -94,32 +97,6 @@ public class RagServiceImp implements RagService {
 
     }
 
-//    @Override
-//    public String askLlm(String query) {
-//        List<Document> documentList = vectorStore.similaritySearch(query);
-//
-//        String systemMessageTemplate = """
-//                Donne la requête MongoDB de la question
-//                CONTEXTE:
-//                     {CONTEXTE}
-//                """;
-//        Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
-//                .createMessage(Map.of("CONTEXTE",documentList));
-//        UserMessage userMessage = new UserMessage(query);
-//        Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
-//        OpenAiApi aiApi = new OpenAiApi(apiKey);
-//        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-//                .withModel("gpt-4-turbo-preview")
-//                .withTemperature(0F)
-//                .withMaxTokens(800)
-//                .build();
-//        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
-//        ChatResponse response = openAiChatClient.call(prompt);
-//        String responseContent = response.getResult().getOutput().getContent();
-//        return responseContent;
-//
-//    }
-
     @Override
     public void textEmbeddingPdf(Resource[] pdfResources) {
         jdbcTemplate.update("delete from vector_store");
@@ -140,7 +117,8 @@ public class RagServiceImp implements RagService {
 
     @Override
     public void textEmbeddingWord(Resource[] worldResources) {
-        jdbcTemplate.update("delete from vector_store");
+//        jdbcTemplate.update("delete from vector_store");
+        vectorRepository.supprimerTout();
         String content = "";
         for(Resource resource : worldResources){
             try (InputStream inputStream = resource.getInputStream()) {
@@ -156,7 +134,7 @@ public class RagServiceImp implements RagService {
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
+//        vectorStore.accept(chunksDocs);
     }
 
 
