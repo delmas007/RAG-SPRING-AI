@@ -61,10 +61,23 @@ public class RagServiceImp implements RagService {
     public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
 
+//        String systemMessageTemplate = """
+//                Répondez à la question,en vous basant uniquement sur le CONTEXTE fourni.
+//                CONTEXTE:
+//                     {CONTEXTE}
+//                """;
         String systemMessageTemplate = """
-                Répondez à la question,en vous basant uniquement sur le CONTEXTE fourni.
+                Vous devez répondre à la question suivante en vous basant uniquement sur le CONTEXTE fourni ci-dessous. Ne fournissez aucune information qui n'est pas contenue dans ce contexte.
+                
+                Votre tâche est de :
+                - Utiliser uniquement le CONTEXTE pour élaborer votre réponse.
+                - Ne pas faire de suppositions ou ajouter des informations qui ne sont pas dans le CONTEXTE.
+                - Si vous ne trouvez pas la réponse dans le CONTEXTE, indiquez que vous ne disposez pas des informations nécessaires.
+
                 CONTEXTE:
-                     {CONTEXTE}
+                    {CONTEXTE}
+
+                Notez que votre réponse doit être précise, concise, et axée sur la question.\s
                 """;
         Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
                 .createMessage(Map.of("CONTEXTE",documentList));
@@ -74,7 +87,7 @@ public class RagServiceImp implements RagService {
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
                 .withModel("gpt-4-turbo-preview")
                 .withTemperature(0F)
-                .withMaxTokens(800)
+                .withMaxTokens(1500 )
                 .build();
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
