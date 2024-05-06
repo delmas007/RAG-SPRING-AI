@@ -118,7 +118,7 @@ public class RagServiceImp implements RagService {
     @Override
     public void textEmbeddingWord(Resource[] worldResources) {
 //        jdbcTemplate.update("delete from vector_store");
-        vectorRepository.supprimerTout();
+       vectorRepository.supprimerTout();
         String content = "";
         for(Resource resource : worldResources){
             try (InputStream inputStream = resource.getInputStream()) {
