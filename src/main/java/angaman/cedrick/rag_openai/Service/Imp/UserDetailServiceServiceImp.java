@@ -17,7 +17,7 @@ public class UserDetailServiceServiceImp implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UtilisateurDto utilisateurDto = utilisateurServiceImp.loadUserByUsername(username);
         if(utilisateurDto==null) throw new UsernameNotFoundException("pas D'utilisateur trouver");
-        String authorities = String.valueOf(utilisateurDto.getRole());
+        String authorities = String.valueOf(utilisateurDto.getRole().getRole());
         UserDetails userDetails = User
                 .withUsername(utilisateurDto.getId())
                 .password(utilisateurDto.getPassword())
