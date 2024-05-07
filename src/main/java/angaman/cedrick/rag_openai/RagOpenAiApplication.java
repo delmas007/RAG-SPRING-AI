@@ -32,6 +32,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,11 @@ public class RagOpenAiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RagOpenAiApplication.class, args);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 //        @Bean

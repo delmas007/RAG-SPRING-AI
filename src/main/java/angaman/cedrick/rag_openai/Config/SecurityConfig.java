@@ -15,7 +15,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/rag/**").hasAuthority("USER")
+                        .requestMatchers("/rag/**","/fichier/**").hasAuthority("USER")
                 )
                 .csrf(AbstractHttpConfigurer::disable);
         return null;

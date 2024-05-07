@@ -6,6 +6,7 @@ import angaman.cedrick.rag_openai.Exception.ErrorCodes;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Repository.UtilisateurRepository;
 import angaman.cedrick.rag_openai.Service.UtilisateurService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,11 +15,14 @@ import java.util.UUID;
 @Service
 public class UtilisateurServiceImp implements UtilisateurService {
 
-    public UtilisateurServiceImp(UtilisateurRepository utilisateurRepository) {
+    UtilisateurRepository utilisateurRepository;
+
+    public UtilisateurServiceImp(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder) {
         this.utilisateurRepository = utilisateurRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    UtilisateurRepository utilisateurRepository;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public UtilisateurDto Inscription(Utilisateur utilisateur) {
@@ -27,7 +31,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
             UtilisateurDto userDto = UtilisateurDto.builder()
                     .id(UUID.randomUUID().toString())
                     .username(utilisateur.getUsername())
-                    .password(utilisateur.getPassword())
+                    .password(passwordEncoder.encode(utilisateur.getPassword()))
                     .nom(utilisateur.getNom())
                     .prenom(utilisateur.getPrenom())
                     .email(utilisateur.getEmail())
