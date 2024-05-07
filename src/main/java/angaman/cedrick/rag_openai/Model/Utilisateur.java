@@ -32,4 +32,8 @@ public class Utilisateur {
     @Column(name = "email",unique = true)
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name = "roleId")
+    private Role role;
+
 }
