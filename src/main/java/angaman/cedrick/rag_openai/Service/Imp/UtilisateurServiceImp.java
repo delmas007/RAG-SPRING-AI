@@ -9,6 +9,7 @@ import angaman.cedrick.rag_openai.Service.UtilisateurService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UtilisateurServiceImp implements UtilisateurService {
@@ -21,9 +22,18 @@ public class UtilisateurServiceImp implements UtilisateurService {
 
     @Override
     public UtilisateurDto Inscription(Utilisateur utilisateur) {
-        UtilisateurDto user = loadUserByUsername(utilisateur.getUsername());
+        Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
         if (user == null){
-            return UtilisateurDto.fromEntity(utilisateurRepository.save(utilisateur));
+            UtilisateurDto userDto = UtilisateurDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .username(utilisateur.getUsername())
+                    .password(utilisateur.getPassword())
+                    .nom(utilisateur.getNom())
+                    .prenom(utilisateur.getPrenom())
+                    .email(utilisateur.getEmail())
+                    .role(utilisateur.getRole())
+                    .build();
+            return UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
         }
         else{
             throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
@@ -34,6 +44,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     @Override
     public UtilisateurDto loadUserByUsername(String username) {
         Optional<Utilisateur> user = utilisateurRepository.findByUsername(username);
-        return UtilisateurDto.fromEntity(user.orElseThrow(null));
+        return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Utilisateur pas trouver ",
+                ErrorCodes.UTILISATEUR_PAS_TROUVER)));
     }
 }
