@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
+@EnableJpaAuditing
 @PropertySource("classpath:Key/.env")
 public class RagOpenAiApplication {
 
