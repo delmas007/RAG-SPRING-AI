@@ -1,9 +1,6 @@
 package angaman.cedrick.rag_openai.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +13,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "utilisateur")
 public class Utilisateur {
+
     @Id
-    @GeneratedValue
-    private Integer id ;
-    private String nom;
-    private String prenom;
-    private String email;
+    private String id ;
+
+    @Column(name = "username",unique = true)
+    private String username;
+
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "nom")
+    private String nom;
+
+    @Column(name = "prenom")
+    private String prenom;
+
+    @Column(name = "email",unique = true)
+    private String email;
+
 }
