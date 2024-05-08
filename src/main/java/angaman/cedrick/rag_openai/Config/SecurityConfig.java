@@ -16,8 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
-@AllArgsConstructor
 public class SecurityConfig {
+
+    public SecurityConfig(UserDetailsService userDetailServiceImp, PasswordEncoder passwordEncoder) {
+        this.userDetailServiceImp = userDetailServiceImp;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     UserDetailsService userDetailServiceImp;
     PasswordEncoder passwordEncoder;
@@ -34,6 +38,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth-> auth
+                        .requestMatchers("/inscription", "/connexion/**").permitAll()
                         .requestMatchers("/rag/**","/fichier/**").hasAuthority("USER")
                         .anyRequest()
                         .authenticated()
@@ -41,6 +46,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .userDetailsService(userDetailServiceImp);
-        return null;
+        return httpSecurity.build();
     }
 }

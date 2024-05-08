@@ -3,6 +3,7 @@ package angaman.cedrick.rag_openai.Service.Imp;
 import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import angaman.cedrick.rag_openai.Exception.EntityNotFoundException;
 import angaman.cedrick.rag_openai.Exception.ErrorCodes;
+import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Repository.UtilisateurRepository;
 import angaman.cedrick.rag_openai.Service.UtilisateurService;
@@ -25,7 +26,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public UtilisateurDto Inscription(Utilisateur utilisateur) {
+    public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
         Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
         if (user == null){
             UtilisateurDto userDto = UtilisateurDto.builder()
@@ -35,7 +36,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
                     .nom(utilisateur.getNom())
                     .prenom(utilisateur.getPrenom())
                     .email(utilisateur.getEmail())
-                    .role(utilisateur.getRole())
+                    .role(Role.builder().role(role.toUpperCase()).build())
                     .build();
             return UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
         }

@@ -1,5 +1,6 @@
 package angaman.cedrick.rag_openai.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,12 +17,18 @@ import java.util.List;
 @Table(name = "role")
 public class Role {
 
+//    @Id
+//    @Column(name = "nom")
+//    @Enumerated(EnumType.STRING)
+//    private Roles role;
+
+
     @Id
     @Column(name = "nom")
-    @Enumerated(EnumType.STRING)
-    private Roles role;
+    private String role;
 
     @OneToMany(mappedBy = "role")
+    @JsonIgnore
     private List<Utilisateur> utilisateur;
 
 

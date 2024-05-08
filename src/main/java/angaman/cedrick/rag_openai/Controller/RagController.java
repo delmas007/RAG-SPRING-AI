@@ -1,16 +1,18 @@
 package angaman.cedrick.rag_openai.Controller;
 
+import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import angaman.cedrick.rag_openai.Service.Imp.RagServiceImp;
+import angaman.cedrick.rag_openai.Service.Imp.UtilisateurServiceImp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,19 +23,33 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
+@AllArgsConstructor
 public class RagController {
 
-    public RagController(RagServiceImp ragServiceImp) {
-        this.ragServiceImp = ragServiceImp;
-    }
+
 
     RagServiceImp ragServiceImp;
+    UtilisateurServiceImp utilisateurServiceImp;
+    AuthenticationManager authenticationManager;
 
 //    @GetMapping("/rag/")
 //    public ResponseEntity<String> rag(@RequestParam(name = "query") String query) {
 //        String response = ragServiceImp.askLlm(query);
 //        return ResponseEntity.ok(response);
 //    }
+
+    @PostMapping("/inscription")
+    public UtilisateurDto save(@RequestBody UtilisateurDto dto,@RequestParam(name = "role") String role) {
+        return utilisateurServiceImp.Inscription(dto,role);
+    }
+
+    @PostMapping("/connexion")
+    public Void Connexion(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username,password)
+        );
+        return null;
+    }
 
     @GetMapping("/rag/")
     public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query) {

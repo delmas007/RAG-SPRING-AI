@@ -1,5 +1,6 @@
 package angaman.cedrick.rag_openai.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class Utilisateur {
     private String email;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "roleId")
     private Role role;
 
