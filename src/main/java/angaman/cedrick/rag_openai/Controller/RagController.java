@@ -11,7 +11,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,11 +43,9 @@ public class RagController {
     }
 
     @PostMapping("/connexion")
-    public Void Connexion(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username,password)
-        );
-        return null;
+    public ResponseEntity<Map<String, String>> Connexion(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
+
+        return utilisateurServiceImp.Connexion(username,password);
     }
 
     @GetMapping("/rag/")

@@ -1,5 +1,6 @@
 package angaman.cedrick.rag_openai.Service.Imp;
 
+
 import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,16 +9,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailServiceServiceImp implements UserDetailsService {
+public class UserDetailServiceImp implements UserDetailsService {
 
-    public UserDetailServiceServiceImp(UtilisateurServiceImp utilisateurServiceImp) {
-        this.utilisateurServiceImp = utilisateurServiceImp;
+    public UserDetailServiceImp(UtilisateurServiceeImp utilisateurServiceeImp) {
+        this.utilisateurServiceeImp = utilisateurServiceeImp;
     }
 
-    UtilisateurServiceImp utilisateurServiceImp;
+    UtilisateurServiceeImp utilisateurServiceeImp;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UtilisateurDto utilisateurDto = utilisateurServiceImp.loadUserByUsername(username);
+        UtilisateurDto utilisateurDto = utilisateurServiceeImp.loadUserByUsername(username);
         if(utilisateurDto==null) throw new UsernameNotFoundException("pas D'utilisateur trouver");
         String authorities = String.valueOf(utilisateurDto.getRole().getRole());
         UserDetails userDetails = User

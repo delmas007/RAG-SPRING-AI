@@ -1,5 +1,6 @@
 package angaman.cedrick.rag_openai;
 
+import angaman.cedrick.rag_openai.Config.RsakeysConfig;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xslf.usermodel.*;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableConfigurationProperties(RsakeysConfig.class)
 @PropertySource("classpath:Key/.env")
 public class RagOpenAiApplication {
 

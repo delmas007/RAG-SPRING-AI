@@ -4,8 +4,10 @@ import angaman.cedrick.rag_openai.Model.vector_store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public interface VectorRepository extends JpaRepository<vector_store, String> {
 
     @Modifying  // Indique que la requête modifie des données
