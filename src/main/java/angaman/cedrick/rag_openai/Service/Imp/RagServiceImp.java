@@ -134,7 +134,7 @@ public class RagServiceImp implements RagService {
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-//        vectorStore.accept(chunksDocs);
+        vectorStore.accept(chunksDocs);
     }
 
 

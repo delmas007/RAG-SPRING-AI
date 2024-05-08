@@ -77,7 +77,9 @@ public class UtilisateurServiceImp implements UtilisateurService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
-        subject=authentication.getName();
+        subject=loadUserByUsername(username).getUsername();
+        String nom = loadUserByUsername(username).getNom();
+        String prenom = loadUserByUsername(username).getPrenom();
         scope=authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
@@ -91,6 +93,8 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 .expiresAt(instant.plus((Duration.ofMinutes(10))))
                 .issuer("security-service")
                 .claim("scope",scope)
+                .claim("nom",nom)
+                .claim("prenom",prenom)
                 .build();
         String jwtAccessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
         idToken.put("accessToken",jwtAccessToken);
