@@ -38,15 +38,19 @@ public class RagController {
 //    }
 
     @PostMapping("/inscription")
-    public UtilisateurDto save(@RequestBody UtilisateurDto dto,@RequestParam(name = "role") String role) {
+    public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
+        String role = "USER";
         return utilisateurServiceImp.Inscription(dto,role);
     }
 
     @PostMapping("/connexion")
-    public ResponseEntity<Map<String, String>> Connexion(@RequestParam(name = "username") String username, @RequestParam(name = "password") String password) {
+    public ResponseEntity<Map<String, String>> Connexion(@RequestBody Map<String, String> authentification) {
+        String username = authentification.get("username");
+        String password = authentification.get("password");
 
-        return utilisateurServiceImp.Connexion(username,password);
+        return utilisateurServiceImp.Connexion(username, password);
     }
+
 
     @GetMapping("/rag/")
     public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query) {
