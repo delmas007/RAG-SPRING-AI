@@ -1,10 +1,8 @@
 package angaman.cedrick.rag_openai.Model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +27,11 @@ public class VectorStore {
 
   @Column(name = "embedding", columnDefinition = "vector(3)")  // 3 est la dimension du vecteur
   private float[] embedding;  // Utiliser float[] pour représenter le vecteur en Java
+
+  @ManyToOne
+  @JsonIgnore
+  @JoinColumn(name = "utilisateur_id")
+  private Utilisateur utilisateur;
 
 }
 

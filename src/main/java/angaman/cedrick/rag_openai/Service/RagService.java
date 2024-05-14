@@ -1,5 +1,7 @@
 package angaman.cedrick.rag_openai.Service;
 
+import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
+import angaman.cedrick.rag_openai.Model.Utilisateur;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,7 +11,7 @@ public interface RagService {
 
     String askLlm(String query);
 
-    void textEmbeddingPdf(Resource[] pdfResources);
+    void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur);
 
 
     void textEmbeddingWord(Resource[] worldResources);

@@ -1,5 +1,7 @@
 package angaman.cedrick.rag_openai.Service.Imp;
 
+import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
+import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Repository.VectorRepository;
 import angaman.cedrick.rag_openai.Service.RagService;
 import org.apache.poi.ss.usermodel.*;
@@ -98,7 +100,7 @@ public class RagServiceImp implements RagService {
     }
 
     @Override
-    public void textEmbeddingPdf(Resource[] pdfResources) {
+    public void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur) {
         jdbcTemplate.update("delete from vector_store");
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
         String content = "";
@@ -112,6 +114,12 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+
+        // Ajouter l'utilisateur à chaque document avant de les accepter dans vectorStore
+        for (Document doc : chunksDocs) {
+            vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
+        }
+
 
     }
 

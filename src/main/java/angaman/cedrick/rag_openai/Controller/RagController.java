@@ -68,7 +68,9 @@ public class RagController {
 
 
     @PostMapping(value = "/fichier/.pdf")
-    public ResponseEntity<Void> textEmbeddingsPdf(@RequestParam("files") MultipartFile[] pdfFiles) {
+    public ResponseEntity<Void> textEmbeddingsPdf(
+            @RequestParam("files") MultipartFile[] pdfFiles,
+            @RequestPart("user") UtilisateurDto utilisateurDto) {
         List<Resource> resources = Arrays.asList(pdfFiles)
                 .stream()
                 .map(file -> {
@@ -79,9 +81,10 @@ public class RagController {
                     }
                 })
                 .collect(Collectors.toList());
-        ragServiceImp.textEmbeddingPdf(((List<?>) resources).toArray(new Resource[0]));
+        ragServiceImp.textEmbeddingPdf(resources.toArray(new Resource[0]), utilisateurDto);
         return ResponseEntity.ok().build();
     }
+
 
 
 
