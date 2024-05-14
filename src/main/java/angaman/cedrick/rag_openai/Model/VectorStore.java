@@ -19,7 +19,7 @@ public class VectorStore {
   @Id
   private String id;
 
-  @Column(name = "content")
+  @Column(name = "content",columnDefinition = "TEXT")
   private String content;
 
   @Column(name = "metadata", columnDefinition = "jsonb")

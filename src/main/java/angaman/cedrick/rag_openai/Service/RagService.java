@@ -9,7 +9,7 @@ import org.stringtemplate.v4.ST;
 
 public interface RagService {
 
-    String askLlm(String query);
+    String askLlm(String query,UtilisateurDto utilisateur);
 
     void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur);
 

@@ -37,8 +37,9 @@ public class RagController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @PostMapping("/inscription")
+    @PostMapping("/inscription/")
     public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
+        System.out.println(dto);
         String role = "USER";
         return utilisateurServiceImp.Inscription(dto,role);
     }
@@ -52,18 +53,19 @@ public class RagController {
     }
 
 
-    @GetMapping("/rag/")
-    public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query) {
+    @PostMapping("/rag/")
+    public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query,
+                                                   @RequestBody UtilisateurDto utilisateurDto) {
         Map<String, Object> response = new HashMap<>();
-        response.put("result", ragServiceImp.askLlm(query));
+        response.put("result", ragServiceImp.askLlm(query,utilisateurDto));
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/ragJson")
-    public Map ragJson(@RequestParam(name = "query") String query) throws JsonProcessingException {
-        String reponse = ragServiceImp.askLlm(query);
-        return new ObjectMapper().readValue(reponse, Map.class);
-    }
+//    @GetMapping("/ragJson")
+//    public Map ragJson(@RequestParam(name = "query") String query) throws JsonProcessingException {
+//        String reponse = ragServiceImp.askLlm(query);
+//        return new ObjectMapper().readValue(reponse, Map.class);
+//    }
 
 
 

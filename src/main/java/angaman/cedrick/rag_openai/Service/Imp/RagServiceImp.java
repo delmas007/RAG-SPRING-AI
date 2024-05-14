@@ -36,10 +36,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -61,8 +58,20 @@ public class RagServiceImp implements RagService {
 
 
     @Override
-    public String askLlm(String query) {
-        List<Document> documentList = vectorStore.similaritySearch(query);
+    public String askLlm(String query,UtilisateurDto utilisateur) {
+//        List<Document> documentList = vectorStore.similaritySearch(query);
+        List<Document> allResults = vectorStore.similaritySearch(query);
+        vectorRepository.findAllVectors();
+
+        // Filtrer les résultats par utilisateur
+         allResults.stream()
+                .filter(doc -> {
+                    Optional<angaman.cedrick.rag_openai.Model.VectorStore> vectorStoreOpt = vectorRepository.findByIdd(doc.getId());
+                    String utilisateurId = utilisateur.getId();
+                    return vectorStoreOpt.isPresent() && utilisateurId.equals(vectorStoreOpt.get().getUtilisateur().getId());
+                })
+                .collect(Collectors.toList());
+
 
         String systemMessageTemplate = """
                 Vous devez répondre à la question suivante en vous basant uniquement sur le CONTEXTE fourni ci-dessous. Ne fournissez aucune information qui n'est pas contenue dans ce contexte.
@@ -78,7 +87,7 @@ public class RagServiceImp implements RagService {
                 Notez que votre réponse doit être précise, concise, et axée sur la question.\s
                 """;
         Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
-                .createMessage(Map.of("CONTEXTE",documentList));
+                .createMessage(Map.of("CONTEXTE",allResults));
         UserMessage userMessage = new UserMessage(query);
         Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
         OpenAiApi aiApi = new OpenAiApi(apiKey);
