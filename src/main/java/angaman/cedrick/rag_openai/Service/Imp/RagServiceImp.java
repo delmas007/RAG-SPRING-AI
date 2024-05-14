@@ -64,11 +64,6 @@ public class RagServiceImp implements RagService {
     public String askLlm(String query) {
         List<Document> documentList = vectorStore.similaritySearch(query);
 
-//        String systemMessageTemplate = """
-//                Répondez à la question,en vous basant uniquement sur le CONTEXTE fourni.
-//                CONTEXTE:
-//                     {CONTEXTE}
-//                """;
         String systemMessageTemplate = """
                 Vous devez répondre à la question suivante en vous basant uniquement sur le CONTEXTE fourni ci-dessous. Ne fournissez aucune information qui n'est pas contenue dans ce contexte.
                 
@@ -101,7 +96,7 @@ public class RagServiceImp implements RagService {
 
     @Override
     public void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur) {
-        jdbcTemplate.update("delete from vector_store");
+        vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
         String content = "";
         for(Resource resource : pdfResources){
@@ -125,7 +120,7 @@ public class RagServiceImp implements RagService {
     @Override
     public void textEmbeddingWord(Resource[] worldResources,UtilisateurDto utilisateur) {
 //        jdbcTemplate.update("delete from vector_store");
-       vectorRepository.supprimerTout();
+       vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
         for(Resource resource : worldResources){
             try (InputStream inputStream = resource.getInputStream()) {
@@ -152,7 +147,7 @@ public class RagServiceImp implements RagService {
 
     @Override
     public void textEmbeddingExcel(Resource[] excelResources,UtilisateurDto utilisateur) {
-        jdbcTemplate.update("delete from vector_store");
+        vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
         for(Resource resource : excelResources){
             try (InputStream inputStream = resource.getInputStream()) {
@@ -190,7 +185,7 @@ public class RagServiceImp implements RagService {
 
     @Override
     public void textEmbeddingPowerpoint(Resource[] PowerpointResources,UtilisateurDto utilisateur) {
-        jdbcTemplate.update("delete from vector_store");
+        vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
         for (Resource resource : PowerpointResources) {
             try (InputStream inputStream = resource.getInputStream()) {

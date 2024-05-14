@@ -79,6 +79,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
         );
         subject=loadUserByUsername(username).getUsername();
         String nom = loadUserByUsername(username).getNom();
+        String id = loadUserByUsername(username).getId();
         String prenom = loadUserByUsername(username).getPrenom();
         scope=authentication.getAuthorities()
                 .stream().map(GrantedAuthority::getAuthority)
@@ -94,6 +95,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 .issuer("security-service")
                 .claim("scope",scope)
                 .claim("nom",nom)
+                .claim("id",id)
                 .claim("prenom",prenom)
                 .build();
         String jwtAccessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();

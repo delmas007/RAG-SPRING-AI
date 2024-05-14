@@ -13,8 +13,8 @@ public interface VectorRepository extends JpaRepository<VectorStore, String> {
 
     @Modifying  // Indique que la requête modifie des données
     @Transactional
-    @Query("delete from VectorStore")
-    void supprimerTout();
+    @Query("delete from VectorStore v where v.utilisateur.id = :utilisateurId")
+    void supprimerParUtilisateurId(@Param("utilisateurId") String utilisateurId);
 
     @Modifying
     @Transactional
