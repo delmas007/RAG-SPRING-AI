@@ -107,7 +107,7 @@ public class RagController {
                         }
                     })
                     .collect(Collectors.toList());
-            ragServiceImp.textEmbeddingWord(resources.toArray(new Resource[0]));
+            ragServiceImp.textEmbeddingWord(resources.toArray(new Resource[0]),utilisateurDto);
 
         return ResponseEntity.status(200).contentType(MediaType.APPLICATION_JSON).build();
         }
@@ -126,7 +126,7 @@ public class RagController {
                     }
                 })
                 .collect(Collectors.toList());
-        ragServiceImp.textEmbeddingExcel(resources.toArray(new Resource[0]));
+        ragServiceImp.textEmbeddingExcel(resources.toArray(new Resource[0]),utilisateurDto);
         return ResponseEntity.ok().build();
     }
 
@@ -161,7 +161,7 @@ public class RagController {
                     }
                 })
                 .collect(Collectors.toList());
-        ragServiceImp.textEmbeddingPowerpoint(resources.toArray(new Resource[0]));
+        ragServiceImp.textEmbeddingPowerpoint(resources.toArray(new Resource[0]),utilisateurDto);
         return ResponseEntity.ok().build();
     }
 
