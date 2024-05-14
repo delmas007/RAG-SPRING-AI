@@ -115,7 +115,6 @@ public class RagServiceImp implements RagService {
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
 
-        // Ajouter l'utilisateur à chaque document avant de les accepter dans vectorStore
         for (Document doc : chunksDocs) {
             vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
         }
@@ -124,7 +123,7 @@ public class RagServiceImp implements RagService {
     }
 
     @Override
-    public void textEmbeddingWord(Resource[] worldResources) {
+    public void textEmbeddingWord(Resource[] worldResources,UtilisateurDto utilisateur) {
 //        jdbcTemplate.update("delete from vector_store");
        vectorRepository.supprimerTout();
         String content = "";
@@ -143,12 +142,16 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content,1000);
         List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+
+        for (Document doc : chunksDocs) {
+            vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
+        }
     }
 
 
 
     @Override
-    public void textEmbeddingExcel(Resource[] excelResources) {
+    public void textEmbeddingExcel(Resource[] excelResources,UtilisateurDto utilisateur) {
         jdbcTemplate.update("delete from vector_store");
         String content = "";
         for(Resource resource : excelResources){
@@ -178,12 +181,15 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content, 1000);
         List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+        for (Document doc : chunksDocs) {
+            vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
+        }
     }
 
 
 
     @Override
-    public void textEmbeddingPowerpoint(Resource[] PowerpointResources) {
+    public void textEmbeddingPowerpoint(Resource[] PowerpointResources,UtilisateurDto utilisateur) {
         jdbcTemplate.update("delete from vector_store");
         String content = "";
         for (Resource resource : PowerpointResources) {
@@ -209,6 +215,9 @@ public class RagServiceImp implements RagService {
         List<String> chunks = tokenTextSplitter.split(content, 1000);
         List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
         vectorStore.accept(chunksDocs);
+        for (Document doc : chunksDocs) {
+            vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
+        }
     }
 
     @Override

@@ -14,11 +14,11 @@ public interface RagService {
     void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur);
 
 
-    void textEmbeddingWord(Resource[] worldResources);
+    void textEmbeddingWord(Resource[] worldResources,UtilisateurDto utilisateur);
 
-    void textEmbeddingExcel(Resource[] excelResources);
+    void textEmbeddingExcel(Resource[] excelResources,UtilisateurDto utilisateur);
 
-    void textEmbeddingPowerpoint(Resource[] PowerpointResources);
+    void textEmbeddingPowerpoint(Resource[] PowerpointResources,UtilisateurDto utilisateur);
 
     String Image(String prompt);
 

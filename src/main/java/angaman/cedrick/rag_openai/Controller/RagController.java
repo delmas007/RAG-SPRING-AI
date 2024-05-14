@@ -89,7 +89,8 @@ public class RagController {
 
 
     @PostMapping("/fichier/.docx")
-        public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles) {
+        public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") MultipartFile[] wordFiles,
+                                                       @RequestPart("user") UtilisateurDto utilisateurDto) {
             if (wordFiles == null || wordFiles.length == 0) {
                 throw new RuntimeException("No files found!"); // Gérer les erreurs si les fichiers sont absents
 
@@ -114,7 +115,8 @@ public class RagController {
 
 
     @PostMapping("/fichier/.xlsx")
-    public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") MultipartFile[] excelFiles) {
+    public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") MultipartFile[] excelFiles,
+                                                    @RequestPart("user") UtilisateurDto utilisateurDto) {
         List<Resource> resources = Arrays.stream(excelFiles)
                 .map(file -> {
                     try {
@@ -148,7 +150,8 @@ public class RagController {
     }
 
     @PostMapping("/fichier/.pptx")
-    public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") MultipartFile[] powerpointFiles) {
+    public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") MultipartFile[] powerpointFiles,
+                                                         @RequestPart("user") UtilisateurDto utilisateurDto) {
         List<Resource> resources = Arrays.stream(powerpointFiles)
                 .map(file -> {
                     try {
