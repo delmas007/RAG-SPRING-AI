@@ -40,8 +40,9 @@ public class Utilisateur {
     @JoinColumn(name = "roleId")
     private Role role;
 
-    @OneToMany(mappedBy = "utilisateur")
-    @JsonIgnore
+//    @OneToMany(mappedBy = "utilisateur")
+//    @JsonIgnore
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VectorStore> vectorStores;
 
 }

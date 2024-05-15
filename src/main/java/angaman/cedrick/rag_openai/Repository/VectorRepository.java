@@ -22,12 +22,23 @@ public interface VectorRepository extends JpaRepository<VectorStore, String> {
 
 
     @Transactional(readOnly = true)
-    @Query("SELECT v FROM VectorStore v")
-    List<VectorStore> findAllVectors();
+    @Query("SELECT v.id FROM VectorStore v")
+    List<String> findAllVectorIds();
+
+
+//    @Transactional
+//    @Query("SELECT v FROM VectorStore v WHERE v.id = :id")
+//    Optional<VectorStore> findByIdd(@Param("id") String id);
 
     @Transactional
-    @Query("SELECT v FROM VectorStore v WHERE v.id = :id")
-    Optional<VectorStore> findByIdd(@Param("id") String id);
+    @Query("SELECT u.id FROM VectorStore v JOIN v.utilisateur u WHERE v.id = :id")
+    Optional<String> findUserIdByVectorStoreId(@Param("id") String id);
+
+
+//    @Transactional
+//    @Query("SELECT v.id FROM VectorStore v WHERE v.id = :id")
+//    Optional<String> findByIdd(@Param("id") String id);
+
 
     @Modifying
     @Transactional

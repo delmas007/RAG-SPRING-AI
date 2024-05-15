@@ -61,14 +61,15 @@ public class RagServiceImp implements RagService {
     public String askLlm(String query,UtilisateurDto utilisateur) {
 //        List<Document> documentList = vectorStore.similaritySearch(query);
         List<Document> allResults = vectorStore.similaritySearch(query);
-        vectorRepository.findAllVectors();
+//        vectorRepository.findAllVectors();
 
         // Filtrer les résultats par utilisateur
          allResults.stream()
                 .filter(doc -> {
-                    Optional<angaman.cedrick.rag_openai.Model.VectorStore> vectorStoreOpt = vectorRepository.findByIdd(doc.getId());
+                    System.out.println(" id doc "+doc.getId());
+                    Optional<String> vectorStoreOpt = vectorRepository.findUserIdByVectorStoreId(doc.getId());
                     String utilisateurId = utilisateur.getId();
-                    return vectorStoreOpt.isPresent() && utilisateurId.equals(vectorStoreOpt.get().getUtilisateur().getId());
+                    return vectorStoreOpt.isPresent() && utilisateurId.equals(vectorStoreOpt.get());
                 })
                 .collect(Collectors.toList());
 
@@ -92,7 +93,8 @@ public class RagServiceImp implements RagService {
         Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
         OpenAiApi aiApi = new OpenAiApi(apiKey);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-                .withModel("gpt-4-turbo-preview")
+//                .withModel("gpt-4-turbo-preview")
+                .withModel("gpt-4o")
                 .withTemperature(0F)
                 .withMaxTokens(1500 )
                 .build();
