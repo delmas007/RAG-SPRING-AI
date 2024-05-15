@@ -25,6 +25,7 @@ import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,19 +60,22 @@ public class RagServiceImp implements RagService {
 
     @Override
     public String askLlm(String query,UtilisateurDto utilisateur) {
-//        List<Document> documentList = vectorStore.similaritySearch(query);
-        List<Document> allResults = vectorStore.similaritySearch(query);
-//        vectorRepository.findAllVectors();
 
-        // Filtrer les résultats par utilisateur
-         allResults.stream()
+        List<Document> allResults = vectorStore.similaritySearch(SearchRequest.query(query).withTopK(100));
+        System.out.println("allResults : "+allResults.size());
+
+//         Récupérer l'ID de l'utilisateur
+        String utilisateurId = utilisateur.getId();
+
+//         Filtrer les résultats pour inclure uniquement les documents liés à l'utilisateur spécifié
+        allResults = allResults.stream()
                 .filter(doc -> {
-                    System.out.println(" id doc "+doc.getId());
-                    Optional<String> vectorStoreOpt = vectorRepository.findUserIdByVectorStoreId(doc.getId());
-                    String utilisateurId = utilisateur.getId();
-                    return vectorStoreOpt.isPresent() && utilisateurId.equals(vectorStoreOpt.get());
+                    Optional<String> vectorStoreUserIdOpt = vectorRepository.findUserIdByVectorStoreId(doc.getId());
+                    return utilisateurId.equals(vectorStoreUserIdOpt.get());
                 })
                 .collect(Collectors.toList());
+
+
 
 
         String systemMessageTemplate = """

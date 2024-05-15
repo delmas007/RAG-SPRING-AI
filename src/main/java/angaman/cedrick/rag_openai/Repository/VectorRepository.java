@@ -1,6 +1,7 @@
 package angaman.cedrick.rag_openai.Repository;
 
 import angaman.cedrick.rag_openai.Model.VectorStore;
+import org.springframework.ai.document.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,6 +34,10 @@ public interface VectorRepository extends JpaRepository<VectorStore, String> {
     @Transactional
     @Query("SELECT u.id FROM VectorStore v JOIN v.utilisateur u WHERE v.id = :id")
     Optional<String> findUserIdByVectorStoreId(@Param("id") String id);
+
+    @Transactional
+    @Query("SELECT v.id, v.embedding FROM VectorStore v ")
+    Optional<Document> findVectorStoreById();
 
 
 //    @Transactional
