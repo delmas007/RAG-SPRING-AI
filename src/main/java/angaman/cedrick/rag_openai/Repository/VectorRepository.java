@@ -2,7 +2,6 @@ package angaman.cedrick.rag_openai.Repository;
 
 import angaman.cedrick.rag_openai.Model.VectorStore;
 import org.springframework.ai.document.Document;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
