@@ -62,7 +62,6 @@ public class RagServiceImp implements RagService {
     public String askLlm(String query,UtilisateurDto utilisateur) {
 
         List<Document> allResults = vectorStore.similaritySearch(SearchRequest.query(query).withTopK(100));
-        System.out.println("allResults : "+allResults.size());
 
 //         Récupérer l'ID de l'utilisateur
         String utilisateurId = utilisateur.getId();
