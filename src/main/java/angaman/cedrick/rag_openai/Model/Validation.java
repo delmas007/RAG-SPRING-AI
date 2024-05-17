@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "calidation")
+@Table(name = "Validation")
 public class Validation {
 
     @Id

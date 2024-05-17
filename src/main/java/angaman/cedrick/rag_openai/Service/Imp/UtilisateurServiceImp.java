@@ -32,16 +32,18 @@ public class UtilisateurServiceImp implements UtilisateurService {
 
     UtilisateurRepository utilisateurRepository;
 
-    public UtilisateurServiceImp(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder,AuthenticationManager authenticationManager,JwtEncoder jwtEncoder) {
+    PasswordEncoder passwordEncoder;
+    AuthenticationManager authenticationManager;
+    JwtEncoder jwtEncoder;
+
+    public UtilisateurServiceImp(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtEncoder jwtEncoder, ValidationServiceImp validationServiceImp) {
         this.utilisateurRepository = utilisateurRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
+        this.validationServiceImp = validationServiceImp;
     }
 
-    PasswordEncoder passwordEncoder;
-    AuthenticationManager authenticationManager;
-    JwtEncoder jwtEncoder;
     ValidationServiceImp validationServiceImp;
 
     @Override
@@ -55,10 +57,11 @@ public class UtilisateurServiceImp implements UtilisateurService {
                     .nom(utilisateur.getNom())
                     .prenom(utilisateur.getPrenom())
                     .email(utilisateur.getEmail())
+                    .actif(false)
                     .role(Role.builder().role(role.toUpperCase()).build())
                     .build();
             UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
-            validationServiceImp.enregistrer(userDto);
+            validationServiceImp.enregistrer(utilisateurDto);
             return utilisateurDto;
         }
         else{

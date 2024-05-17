@@ -29,3 +29,12 @@ services:
       - '.servers.json:/pgadmin4/servers.json'
     ports:
         - '5050:80'
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      # Change the number before : to the port the web interface should be accessible on
+      - '5081:80'
+      # Change the number before : to the port the SMTP server should be accessible on
+      - '9025:25'

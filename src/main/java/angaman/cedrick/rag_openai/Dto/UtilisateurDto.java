@@ -2,6 +2,7 @@ package angaman.cedrick.rag_openai.Dto;
 
 import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class UtilisateurDto {
     private String nom;
     private String prenom;
     private String email;
+    private Boolean actif;
     private Role role;
 
     public static UtilisateurDto fromEntity(Utilisateur utilisateur){
@@ -27,6 +29,7 @@ public class UtilisateurDto {
                 .nom(utilisateur.getNom())
                 .prenom(utilisateur.getPrenom())
                 .email(utilisateur.getEmail())
+                .actif(utilisateur.getActif())
                 .role(utilisateur.getRole())
                 .build();
     }
@@ -42,6 +45,7 @@ public class UtilisateurDto {
                 .nom(utilisateurDto.getNom())
                 .prenom(utilisateurDto.getPrenom())
                 .email(utilisateurDto.getEmail())
+                .actif(utilisateurDto.getActif())
                 .role(utilisateurDto.getRole())
                 .build();
     }
