@@ -42,6 +42,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     PasswordEncoder passwordEncoder;
     AuthenticationManager authenticationManager;
     JwtEncoder jwtEncoder;
+    ValidationServiceImp validationServiceImp;
 
     @Override
     public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
@@ -56,7 +57,9 @@ public class UtilisateurServiceImp implements UtilisateurService {
                     .email(utilisateur.getEmail())
                     .role(Role.builder().role(role.toUpperCase()).build())
                     .build();
-            return UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
+            UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
+            validationServiceImp.enregistrer(userDto);
+            return utilisateurDto;
         }
         else{
             throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
