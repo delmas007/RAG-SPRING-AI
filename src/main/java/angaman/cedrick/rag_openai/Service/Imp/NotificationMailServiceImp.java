@@ -4,7 +4,9 @@ import angaman.cedrick.rag_openai.Model.Validation;
 import angaman.cedrick.rag_openai.Service.NotificationMailService;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NotificationMailServiceImp implements NotificationMailService {
 
     public NotificationMailServiceImp(JavaMailSender javaMailSender) {

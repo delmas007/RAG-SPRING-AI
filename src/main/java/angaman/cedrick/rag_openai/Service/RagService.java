@@ -5,7 +5,9 @@ import angaman.cedrick.rag_openai.Model.Utilisateur;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 import org.stringtemplate.v4.ST;
+
 
 public interface RagService {
 

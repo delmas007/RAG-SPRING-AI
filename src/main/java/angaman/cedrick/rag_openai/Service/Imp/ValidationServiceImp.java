@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
-
+@Service
 public class ValidationServiceImp implements ValidationService {
 
     public ValidationServiceImp(ValidationRepository validationRepository, NotificationMailServiceImp notificationMailServiceImp) {

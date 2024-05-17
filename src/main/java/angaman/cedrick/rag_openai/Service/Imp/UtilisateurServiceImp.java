@@ -49,6 +49,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     @Override
     public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
         Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
+//        Optional<Utilisateur> userOptional = utilisateurRepository.findByUsername(utilisateur.getUsername());
         if (user == null){
             UtilisateurDto userDto = UtilisateurDto.builder()
                     .id(UUID.randomUUID().toString())
