@@ -35,6 +35,9 @@ public class Utilisateur {
     @Column(name = "email",unique = true)
     private String email;
 
+    @Column(name = "actif")
+    private Boolean actif;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "roleId")
@@ -44,5 +47,7 @@ public class Utilisateur {
 //    @JsonIgnore
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VectorStore> vectorStores;
+
+
 
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,6 +38,7 @@ public class RagController {
 //        return ResponseEntity.ok(response);
 //    }
 
+    @ResponseStatus
     @PostMapping("/inscription/")
     public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
         System.out.println(dto);
