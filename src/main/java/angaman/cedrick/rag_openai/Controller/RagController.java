@@ -3,8 +3,7 @@ package angaman.cedrick.rag_openai.Controller;
 import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import angaman.cedrick.rag_openai.Service.Imp.RagServiceImp;
 import angaman.cedrick.rag_openai.Service.Imp.UtilisateurServiceImp;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import angaman.cedrick.rag_openai.Service.Imp.ValidationServiceImp;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,8 +25,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class RagController {
 
-
-
+    ValidationServiceImp validationServiceImp;
     RagServiceImp ragServiceImp;
     UtilisateurServiceImp utilisateurServiceImp;
     AuthenticationManager authenticationManager;
@@ -38,7 +36,7 @@ public class RagController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @ResponseStatus
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/inscription/")
     public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
         System.out.println(dto);
@@ -52,6 +50,14 @@ public class RagController {
         String password = authentification.get("password");
 
         return utilisateurServiceImp.Connexion(username, password);
+    }
+
+    @PostMapping("/activation")
+    public Void activation(@RequestBody Map<String, String> authentification) {
+        String code = authentification.get("code");
+        String password = authentification.get("password");
+
+        return validationServiceImp.activation(code, password);
     }
 
 

@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AllArgsConstructor
+@Getter
 public enum ErrorCodes {
     UTILISATEUR_PAS_TROUVER(900),
-    UTILISATEUR_DEJA_EXIST(800);
+    UTILISATEUR_DEJA_EXIST(800),
+    CODE_INVALIDE(700),
+    CODE_EXPIRE(600);
 
-    @Getter
-    @Setter
-    private int code;
+
+
+    private final int code;
 }

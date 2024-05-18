@@ -27,7 +27,7 @@ public class Validation {
 
     private String code;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     private Utilisateur utilisateur;
 
 }

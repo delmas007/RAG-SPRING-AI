@@ -7,6 +7,9 @@ import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Repository.UtilisateurRepository;
 import angaman.cedrick.rag_openai.Service.UtilisateurService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,13 +48,15 @@ public class UtilisateurServiceImp implements UtilisateurService {
     }
 
     ValidationServiceImp validationServiceImp;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
+    @Transactional
     public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
-        Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
-//        Optional<Utilisateur> userOptional = utilisateurRepository.findByUsername(utilisateur.getUsername());
-        if (user == null){
-            UtilisateurDto userDto = UtilisateurDto.builder()
+        Utilisateur existingUser = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
+        if (existingUser == null) {
+            Utilisateur newUser = Utilisateur.builder()
                     .id(UUID.randomUUID().toString())
                     .username(utilisateur.getUsername())
                     .password(passwordEncoder.encode(utilisateur.getPassword()))
@@ -61,15 +66,39 @@ public class UtilisateurServiceImp implements UtilisateurService {
                     .actif(false)
                     .role(Role.builder().role(role.toUpperCase()).build())
                     .build();
-            UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
+            Utilisateur savedUser = utilisateurRepository.save(newUser);
+            UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(savedUser);
+            entityManager.close();
             validationServiceImp.enregistrer(utilisateurDto);
             return utilisateurDto;
-        }
-        else{
+        } else {
             throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
-
         }
     }
+
+//    public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
+//        Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
+////        Optional<Utilisateur> userOptional = utilisateurRepository.findByUsername(utilisateur.getUsername());
+//        if (user == null){
+//            UtilisateurDto userDto = UtilisateurDto.builder()
+//                    .id(UUID.randomUUID().toString())
+//                    .username(utilisateur.getUsername())
+//                    .password(passwordEncoder.encode(utilisateur.getPassword()))
+//                    .nom(utilisateur.getNom())
+//                    .prenom(utilisateur.getPrenom())
+//                    .email(utilisateur.getEmail())
+//                    .actif(false)
+//                    .role(Role.builder().role(role.toUpperCase()).build())
+//                    .build();
+//            UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
+//            validationServiceImp.enregistrer(utilisateurDto);
+//            return utilisateurDto;
+//        }
+//        else{
+//            throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
+//
+//        }
+//    }
 
     @Override
     public UtilisateurDto loadUserByUsername(String username) {
