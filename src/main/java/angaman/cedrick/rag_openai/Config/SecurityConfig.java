@@ -52,7 +52,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/inscription/**", "/connexion/**").permitAll()
+                        .requestMatchers("/inscription/**", "/connexion/**","/activation/**").permitAll()
                         .requestMatchers("/rag/**","/fichier/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
                         .anyRequest()
                         .authenticated()

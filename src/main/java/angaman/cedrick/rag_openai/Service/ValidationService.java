@@ -11,5 +11,5 @@ public interface ValidationService {
 
     void enregistrer(UtilisateurDto utilisateurDto);
 
-    Void activation(String username, String password);
+
 }

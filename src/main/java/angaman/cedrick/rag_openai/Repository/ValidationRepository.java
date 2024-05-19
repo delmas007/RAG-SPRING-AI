@@ -2,6 +2,8 @@ package angaman.cedrick.rag_openai.Repository;
 
 import angaman.cedrick.rag_openai.Model.Validation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -9,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ValidationRepository extends JpaRepository<Validation, Integer> {
 
-    Optional<Validation> findByCode(String code);
+    @Query("SELECT v FROM Validation v WHERE v.code = :code")
+    Optional<Validation> findByCode(@Param("code") String code);
 }

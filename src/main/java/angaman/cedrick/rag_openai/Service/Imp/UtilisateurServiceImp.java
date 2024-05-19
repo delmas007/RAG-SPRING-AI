@@ -5,7 +5,9 @@ import angaman.cedrick.rag_openai.Exception.EntityNotFoundException;
 import angaman.cedrick.rag_openai.Exception.ErrorCodes;
 import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
+import angaman.cedrick.rag_openai.Model.Validation;
 import angaman.cedrick.rag_openai.Repository.UtilisateurRepository;
+import angaman.cedrick.rag_openai.Repository.ValidationRepository;
 import angaman.cedrick.rag_openai.Service.UtilisateurService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -38,13 +40,15 @@ public class UtilisateurServiceImp implements UtilisateurService {
     PasswordEncoder passwordEncoder;
     AuthenticationManager authenticationManager;
     JwtEncoder jwtEncoder;
+    ValidationRepository validationRepository;
 
-    public UtilisateurServiceImp(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtEncoder jwtEncoder, ValidationServiceImp validationServiceImp) {
+    public UtilisateurServiceImp(ValidationRepository validationRepository,UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtEncoder jwtEncoder, ValidationServiceImp validationServiceImp) {
         this.utilisateurRepository = utilisateurRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
         this.validationServiceImp = validationServiceImp;
+        this.validationRepository = validationRepository;
     }
 
     ValidationServiceImp validationServiceImp;
@@ -74,6 +78,20 @@ public class UtilisateurServiceImp implements UtilisateurService {
         } else {
             throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
         }
+    }
+
+    @Override
+    public Void activation(String code) {
+        Validation leCodeEstInvalide = validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
+                ErrorCodes.CODE_INVALIDE));
+        if (Instant.now().isAfter(leCodeEstInvalide.getExpiration())) {
+            throw new EntityNotFoundException("Le code a expiré", ErrorCodes.CODE_EXPIRE);
+        }
+        Utilisateur utilisateurActiver = utilisateurRepository.findById(leCodeEstInvalide.getUtilisateur().getId()).orElseThrow(() -> new EntityNotFoundException("Utilisateur pas trouver",
+                ErrorCodes.UTILISATEUR_PAS_TROUVER));
+        utilisateurActiver.setActif(true);
+        utilisateurRepository.save(utilisateurActiver);
+        return null;
     }
 
 //    public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {

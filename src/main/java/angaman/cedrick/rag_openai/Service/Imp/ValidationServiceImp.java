@@ -24,7 +24,7 @@ public class ValidationServiceImp implements ValidationService {
         this.notificationMailServiceImp = notificationMailServiceImp;
     }
 
-    private final ValidationRepository validationRepository;
+    final ValidationRepository validationRepository;
     private final NotificationMailServiceImp notificationMailServiceImp;
     @PersistenceContext
     private EntityManager entityManager;
@@ -49,15 +49,7 @@ public class ValidationServiceImp implements ValidationService {
         notificationMailServiceImp.sendNotificationMail(validation);
     }
 
-    @Override
-    public Void activation(String code, String password) {
-        Validation leCodeEstInvalide = validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
-                ErrorCodes.CODE_INVALIDE));
-        if (Instant.now().isAfter(leCodeEstInvalide.getExpiration())) {
-            throw new EntityNotFoundException("Le code a expiré", ErrorCodes.CODE_EXPIRE);
-        }
-        return null;
-    }
+
 
 
 //    public void enregistrer(UtilisateurDto utilisateurDto) {

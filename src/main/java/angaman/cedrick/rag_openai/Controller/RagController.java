@@ -52,12 +52,12 @@ public class RagController {
         return utilisateurServiceImp.Connexion(username, password);
     }
 
-    @PostMapping("/activation")
-    public Void activation(@RequestBody Map<String, String> authentification) {
-        String code = authentification.get("code");
-        String password = authentification.get("password");
+    @PostMapping("/activation/")
+    public Void activation(@RequestBody Map<String, String> codes) {
+        System.out.println(codes);
+        String code = codes.get("code");
 
-        return validationServiceImp.activation(code, password);
+        return utilisateurServiceImp.activation(code);
     }
 
 

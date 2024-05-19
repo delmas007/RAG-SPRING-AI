@@ -10,7 +10,7 @@ public interface UtilisateurService {
 
     UtilisateurDto Inscription(UtilisateurDto utilisateur,String role);
 
-
+    Void activation(String code);
     UtilisateurDto loadUserByUsername(String username);
 
 }
