@@ -2,28 +2,54 @@ package angaman.cedrick.rag_openai.Service.Imp;
 
 import angaman.cedrick.rag_openai.Model.Validation;
 import angaman.cedrick.rag_openai.Service.NotificationMailService;
-import org.springframework.mail.SimpleMailMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationMailServiceImp implements NotificationMailService {
 
+    private final JavaMailSender javaMailSender;
+
     public NotificationMailServiceImp(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
-    JavaMailSender javaMailSender;
     @Override
     public void sendNotificationMail(Validation validation) {
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom("Angamancedrick@gmail.com");
-        mail.setTo(validation.getUtilisateur().getEmail());
-        mail.setSubject("Votre code d'activation");
-        String message = "Bonjour "+validation.getUtilisateur().getNom()+"\n"+
-                "Voici votre code d'activation: "+validation.getCode();
-        mail.setText(message);
-        javaMailSender.send(mail);
+        try {
+            MimeMessage mail = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mail, true);
 
+            helper.setFrom("yaoivan2002@gmail.com");
+            helper.setTo(validation.getUtilisateur().getEmail());
+            helper.setSubject("Votre code d'activation");
+
+            String content = "<html>" +
+                    "<body>" +
+                    "    <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #edf2f7; padding: 20px; text-align: center;\">" +
+                    "        <div style=\"background-color: #ffffff; width: 100%; max-width: 480px; margin: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; border-left: 5px solid #4a90e2;\">" +
+                    "            <div style=\"background-color: #4a90e2; color: white; padding: 20px; font-size: 18px; text-align: center;\">Confirmation de votre compte</div>" +
+                    "            <div style=\"padding: 20px; color: #333333; line-height: 1.6; text-align: center;\">" +
+                    "                Bonjour <strong>" + validation.getUtilisateur().getNom() + "</strong>,<br><br>" +
+                    "                Merci de vous joindre à nous. Veuillez entrer le code de confirmation suivant pour activer votre compte.<br>" +
+                    "                <div style=\"font-size: 24px; font-weight: bold; background-color: #E8F0FE; color: #4a90e2; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 20px 0;\">" +
+                    "                    " + validation.getCode() + "" +
+                    "                </div>" +
+                    "                Si vous n'avez pas demandé ce code, veuillez ignorer cet e-mail ou nous contacter." +
+                    "            </div>" +
+                    "            <div style=\"background-color: #f7f7f7; color: #666666; text-align: center; padding: 12px 20px; font-size: 14px;\">© 2024 Votre Entreprise Tous droits réservés.</div>" +
+                    "        </div>" +
+                    "    </div>" +
+                    "</body>" +
+                    "</html>";
+
+            helper.setText(content, true);
+            javaMailSender.send(mail);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }

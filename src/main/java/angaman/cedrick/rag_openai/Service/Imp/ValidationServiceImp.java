@@ -41,6 +41,7 @@ public class ValidationServiceImp implements ValidationService {
         validation.setExpiration(expiration);
 
         Random random = new Random();
+
         int randomCode = random.nextInt(999999);
         String code = String.format("%06d", randomCode);
 
