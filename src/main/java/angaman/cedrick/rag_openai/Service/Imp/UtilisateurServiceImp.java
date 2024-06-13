@@ -128,10 +128,15 @@ public class UtilisateurServiceImp implements UtilisateurService {
     public ResponseEntity<Map<String, String>> Connexion(String username, String password) {
         String subject=null;
         String scope=null;
+        UtilisateurDto utilisateur = loadUserByUsername(username);
+
+        if (utilisateur.getActif()) {
+            throw new EntityNotFoundException("Utilisateur non actif", ErrorCodes.UTILISATEUR_NON_ACTIF);
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
-        subject=loadUserByUsername(username).getUsername();
+        subject=utilisateur.getUsername();
         String nom = loadUserByUsername(username).getNom();
         String id = loadUserByUsername(username).getId();
         String prenom = loadUserByUsername(username).getPrenom();
