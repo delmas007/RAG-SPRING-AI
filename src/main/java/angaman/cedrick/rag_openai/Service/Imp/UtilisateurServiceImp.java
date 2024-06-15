@@ -81,7 +81,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     }
 
     @Override
-    public Void activation(String code) {
+    public int activation(String code) {
         Validation leCodeEstInvalide = validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
                 ErrorCodes.CODE_INVALIDE));
         if (Instant.now().isAfter(leCodeEstInvalide.getExpiration())) {
@@ -91,7 +91,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 ErrorCodes.UTILISATEUR_PAS_TROUVER));
         utilisateurActiver.setActif(true);
         utilisateurRepository.save(utilisateurActiver);
-        return null;
+        return 1;
     }
 
 //    public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
@@ -130,7 +130,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
         String scope=null;
         UtilisateurDto utilisateur = loadUserByUsername(username);
 
-        if (utilisateur.getActif()) {
+        if (!utilisateur.getActif()) {
             throw new EntityNotFoundException("Utilisateur non actif", ErrorCodes.UTILISATEUR_NON_ACTIF);
         }
         Authentication authentication = authenticationManager.authenticate(

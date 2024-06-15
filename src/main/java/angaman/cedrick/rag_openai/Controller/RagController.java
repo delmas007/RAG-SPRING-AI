@@ -39,7 +39,7 @@ public class RagController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/inscription/")
     public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
-        System.out.println(dto);
+        System.out.println("Request received: " + dto);
         String role = "USER";
         return utilisateurServiceImp.Inscription(dto,role);
     }
@@ -53,7 +53,7 @@ public class RagController {
     }
 
     @PostMapping("/activation/")
-    public Void activation(@RequestBody Map<String, String> codes) {
+    public int activation(@RequestBody Map<String, String> codes) {
         System.out.println(codes);
         String code = codes.get("code");
 

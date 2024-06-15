@@ -51,19 +51,19 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeHttpRequests(auth-> auth
-                        .requestMatchers("/inscription/**", "/connexion/**","/activation/**").permitAll()
-                        .requestMatchers("/rag/**","/fichier/**").hasAnyAuthority("SCOPE_USER","SCOPE_ADMIN")
-                        .anyRequest()
-                        .authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/inscription/**", "/connexion/**", "/activation/**","/inscriptio").permitAll()
+                        .requestMatchers("/rag/**", "/fichier/**").hasAnyAuthority("SCOPE_USER", "SCOPE_ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2->oauth2.jwt(Customizer.withDefaults()))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .cors(Customizer.withDefaults())
                 .userDetailsService(userDetailServiceImp);
         return httpSecurity.build();
     }
+
 
     @Bean
     JwtDecoder jwtDecoder(){
