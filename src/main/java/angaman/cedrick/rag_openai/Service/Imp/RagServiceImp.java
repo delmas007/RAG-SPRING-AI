@@ -72,7 +72,7 @@ public class RagServiceImp implements RagService {
                     Optional<String> vectorStoreUserIdOpt = vectorRepository.findUserIdByVectorStoreId(doc.getId());
                     return utilisateurId.equals(vectorStoreUserIdOpt.get());
                 })
-                .collect(Collectors.toList());
+                .toList();
 
 
 
@@ -88,7 +88,7 @@ public class RagServiceImp implements RagService {
                 CONTEXTE:
                     {CONTEXTE}
 
-                Notez que votre réponse doit être précise, concise, et axée sur la question.\s
+                Notez que votre réponse doit être bien organiser respecte les retour a la ligne, précise, concise, et axée sur la question.\s
                 """;
         Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
                 .createMessage(Map.of("CONTEXTE",allResults));

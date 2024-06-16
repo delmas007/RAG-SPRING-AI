@@ -121,7 +121,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     @Override
     public UtilisateurDto loadUserByUsername(String username) {
         Optional<Utilisateur> user = utilisateurRepository.findByUsername(username);
-        return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Utilisateur pas trouver ",
+        return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Utilisateur inexistant ",
                 ErrorCodes.UTILISATEUR_PAS_TROUVER)));
     }
 
