@@ -94,30 +94,6 @@ public class UtilisateurServiceImp implements UtilisateurService {
         return 1;
     }
 
-//    public UtilisateurDto Inscription(UtilisateurDto utilisateur, String role) {
-//        Utilisateur user = utilisateurRepository.findByUsername(utilisateur.getUsername()).orElse(null);
-////        Optional<Utilisateur> userOptional = utilisateurRepository.findByUsername(utilisateur.getUsername());
-//        if (user == null){
-//            UtilisateurDto userDto = UtilisateurDto.builder()
-//                    .id(UUID.randomUUID().toString())
-//                    .username(utilisateur.getUsername())
-//                    .password(passwordEncoder.encode(utilisateur.getPassword()))
-//                    .nom(utilisateur.getNom())
-//                    .prenom(utilisateur.getPrenom())
-//                    .email(utilisateur.getEmail())
-//                    .actif(false)
-//                    .role(Role.builder().role(role.toUpperCase()).build())
-//                    .build();
-//            UtilisateurDto utilisateurDto = UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(userDto)));
-//            validationServiceImp.enregistrer(utilisateurDto);
-//            return utilisateurDto;
-//        }
-//        else{
-//            throw new EntityNotFoundException("Utilisateur existe deja", ErrorCodes.UTILISATEUR_DEJA_EXIST);
-//
-//        }
-//    }
-
     @Override
     public UtilisateurDto loadUserByUsername(String username) {
         Optional<Utilisateur> user = utilisateurRepository.findByUsername(username);

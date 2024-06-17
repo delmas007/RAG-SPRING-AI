@@ -2,6 +2,7 @@ package angaman.cedrick.rag_openai.Controller;
 
 import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import angaman.cedrick.rag_openai.Service.Imp.RagServiceImp;
+import angaman.cedrick.rag_openai.Service.Imp.ResendMailImp;
 import angaman.cedrick.rag_openai.Service.Imp.UtilisateurServiceImp;
 import angaman.cedrick.rag_openai.Service.Imp.ValidationServiceImp;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class RagController {
     RagServiceImp ragServiceImp;
     UtilisateurServiceImp utilisateurServiceImp;
     AuthenticationManager authenticationManager;
+    ResendMailImp resendMailImp;
 
 //    @GetMapping("/rag/")
 //    public ResponseEntity<String> rag(@RequestParam(name = "query") String query) {
@@ -50,6 +52,11 @@ public class RagController {
         String password = authentification.get("password");
 
         return utilisateurServiceImp.Connexion(username, password);
+    }
+
+    @PostMapping("/resendMail/")
+    public int resend(@RequestBody String email) {
+        return resendMailImp.resendMail(email);
     }
 
     @PostMapping("/activation/")
