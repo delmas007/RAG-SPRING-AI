@@ -6,6 +6,8 @@ import angaman.cedrick.rag_openai.Service.Imp.ResendMailImp;
 import angaman.cedrick.rag_openai.Service.Imp.UtilisateurServiceImp;
 import angaman.cedrick.rag_openai.Service.Imp.ValidationServiceImp;
 import lombok.AllArgsConstructor;
+import org.springframework.ai.retry.NonTransientAiException;
+import org.springframework.ai.retry.TransientAiException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -72,8 +74,21 @@ public class RagController {
     public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query,
                                                    @RequestBody UtilisateurDto utilisateurDto) {
         Map<String, Object> response = new HashMap<>();
-        response.put("result", ragServiceImp.askLlm(query,utilisateurDto));
-        return ResponseEntity.ok(response);
+        try {
+            response.put("result", ragServiceImp.askLlm(query, utilisateurDto));
+            return ResponseEntity.ok(response);
+        } catch (NonTransientAiException e) {
+            if (e.getMessage().contains("rate_limit_exceeded")) {
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Map.of("error", "Limite de requêtes dépassée. Veuillez réessayer plus tard."));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Erreur interne du serveur. Veuillez réessayer plus tard."));
+            }
+        } catch (TransientAiException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur temporaire du serveur. Veuillez réessayer plus tard."));
+        }
     }
 
 //    @GetMapping("/ragJson")

@@ -23,7 +23,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
             MimeMessage mail = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mail, true);
 
-            helper.setFrom("yaoivan2002@gmail.com");
+            helper.setFrom("angamancedrick@gmail.com");
             helper.setTo(validation.getUtilisateur().getEmail());
             helper.setSubject("Votre code d'activation");
 

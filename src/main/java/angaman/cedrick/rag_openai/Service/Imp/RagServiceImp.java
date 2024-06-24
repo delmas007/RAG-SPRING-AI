@@ -61,7 +61,7 @@ public class RagServiceImp implements RagService {
     @Override
     public String askLlm(String query,UtilisateurDto utilisateur) {
 
-        List<Document> allResults = vectorStore.similaritySearch(SearchRequest.query(query).withTopK(100));
+        List<Document> allResults = vectorStore.similaritySearch(SearchRequest.query(query).withTopK(30));
 
 //         Récupérer l'ID de l'utilisateur
         String utilisateurId = utilisateur.getId();
@@ -99,7 +99,7 @@ public class RagServiceImp implements RagService {
 //                .withModel("gpt-4-turbo-preview")
                 .withModel("gpt-4o")
                 .withTemperature(0F)
-                .withMaxTokens(1500 )
+                .withMaxTokens(1500)
                 .build();
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
