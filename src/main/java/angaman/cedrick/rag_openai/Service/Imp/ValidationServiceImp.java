@@ -32,7 +32,7 @@ public class ValidationServiceImp implements ValidationService {
 
     @Override
     @Transactional
-        public void enregistrer(UtilisateurDto utilisateurDto) {
+        public void  enregistrer(UtilisateurDto utilisateurDto) {
         Validation validation = new Validation();
         validation.setUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
         Instant creation = Instant.now();
@@ -62,4 +62,10 @@ public class ValidationServiceImp implements ValidationService {
 
 
     }
+
+    public Validation lireEnFonctionDuCode(String code) {
+        return this.validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
+                ErrorCodes.CODE_INVALIDE));
+    }
+
 }

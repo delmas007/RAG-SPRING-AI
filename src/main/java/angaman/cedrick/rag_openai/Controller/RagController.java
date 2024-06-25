@@ -69,6 +69,19 @@ public class RagController {
         return utilisateurServiceImp.activation(code);
     }
 
+    @PostMapping("/modifierMotDePasse/")
+    public int motDePasse(@RequestBody Map<String, String> username) {
+        String emaile = username.get("username");
+
+        return utilisateurServiceImp.motDePasse(emaile);
+    }
+
+    @PostMapping("/NouveauMotDePasse/")
+    public int NouveauMotDePasse(@RequestBody Map<String, String> donnees) {
+
+        return utilisateurServiceImp.NouveauMotDePasse(donnees);
+    }
+
 
     @PostMapping("/rag/")
     public ResponseEntity<Map<String, Object>> rag(@RequestParam(name = "query") String query,

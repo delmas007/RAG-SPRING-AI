@@ -86,8 +86,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
 
     @Override
     public int activation(String code) {
-        Validation leCodeEstInvalide = validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
-                ErrorCodes.CODE_INVALIDE));
+        Validation leCodeEstInvalide = validationServiceImp.lireEnFonctionDuCode(code);
         if (Instant.now().isAfter(leCodeEstInvalide.getExpiration())) {
             throw new EntityNotFoundException("Le code a expiré", ErrorCodes.CODE_EXPIRE);
         }
@@ -95,6 +94,25 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 ErrorCodes.UTILISATEUR_PAS_TROUVER));
         utilisateurActiver.setActif(true);
         utilisateurRepository.save(utilisateurActiver);
+        return 1;
+    }
+    public int motDePasse(String username) {
+        UtilisateurDto utilisateurDto = loadUserByUsername(username);
+        validationServiceImp.enregistrer(utilisateurDto);
+        return 1;
+    }
+
+    @Transactional
+    public int NouveauMotDePasse(Map<String, String> donnees) {
+        Validation validation = validationServiceImp.lireEnFonctionDuCode(donnees.get("code"));
+        UtilisateurDto utilisateurDto = loadUserByUsername(donnees.get("username"));
+        Utilisateur entity = UtilisateurDto.toEntity(utilisateurDto);
+
+        if(validation.getUtilisateur().getId().equals(entity.getId())){
+            String mdpCrypte = passwordEncoder.encode(donnees.get("password"));
+            entity.setPassword(mdpCrypte);
+            return 1;
+        }
         return 1;
     }
 
@@ -155,4 +173,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
 
         return new ResponseEntity<>(idToken, HttpStatus.OK);
     }
+
+
+
 }
