@@ -7,6 +7,7 @@ import angaman.cedrick.rag_openai.Model.Jwt;
 import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Model.Validation;
+import angaman.cedrick.rag_openai.Repository.JwtRepository;
 import angaman.cedrick.rag_openai.Repository.UtilisateurRepository;
 import angaman.cedrick.rag_openai.Repository.ValidationRepository;
 import angaman.cedrick.rag_openai.Service.UtilisateurService;
@@ -42,14 +43,16 @@ public class UtilisateurServiceImp implements UtilisateurService {
     AuthenticationManager authenticationManager;
     JwtEncoder jwtEncoder;
     ValidationRepository validationRepository;
+    JwtRepository jwtRepository;
 
-    public UtilisateurServiceImp(ValidationRepository validationRepository,UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtEncoder jwtEncoder, ValidationServiceImp validationServiceImp) {
+    public UtilisateurServiceImp(ValidationRepository validationRepository,UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtEncoder jwtEncoder, ValidationServiceImp validationServiceImp, JwtRepository jwtRepository) {
         this.utilisateurRepository = utilisateurRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtEncoder = jwtEncoder;
         this.validationServiceImp = validationServiceImp;
         this.validationRepository = validationRepository;
+        this.jwtRepository = jwtRepository;
     }
 
     ValidationServiceImp validationServiceImp;
@@ -137,10 +140,12 @@ public class UtilisateurServiceImp implements UtilisateurService {
         String jwtAccessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
         idToken.put("accessToken",jwtAccessToken);
         final Jwt jwt = Jwt.builder()
+                .value(jwtAccessToken)
                 .desactive(false)
                 .expire(false)
                 .utilisateur(UtilisateurDto.toEntity(utilisateur))
                 .build();
+        this.jwtRepository.save(jwt);
 
         return new ResponseEntity<>(idToken, HttpStatus.OK);
     }
