@@ -105,6 +105,12 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 ErrorCodes.UTILISATEUR_PAS_TROUVER)));
     }
 
+    public Jwt tokenByValue(String value) {
+        return jwtRepository.findByValueAndDesactiveAndExpire(
+                value, false, false
+        ).orElseThrow(() -> new EntityNotFoundException("Token invalide", ErrorCodes.TOKEN_INVALIDE));
+    }
+
     public ResponseEntity<Map<String, String>> Connexion(String username, String password) {
         String subject=null;
         String scope=null;
