@@ -48,6 +48,11 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VectorStore> vectorStores;
 
+    @OneToMany(mappedBy = "utilisateur")
+    private List<Jwt> jwts;
+
+
+
 
 
 }

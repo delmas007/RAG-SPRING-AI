@@ -3,6 +3,7 @@ package angaman.cedrick.rag_openai.Service.Imp;
 import angaman.cedrick.rag_openai.Dto.UtilisateurDto;
 import angaman.cedrick.rag_openai.Exception.EntityNotFoundException;
 import angaman.cedrick.rag_openai.Exception.ErrorCodes;
+import angaman.cedrick.rag_openai.Model.Jwt;
 import angaman.cedrick.rag_openai.Model.Role;
 import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Model.Validation;
@@ -135,6 +136,11 @@ public class UtilisateurServiceImp implements UtilisateurService {
                 .build();
         String jwtAccessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
         idToken.put("accessToken",jwtAccessToken);
+        final Jwt jwt = Jwt.builder()
+                .desactive(false)
+                .expire(false)
+                .utilisateur(UtilisateurDto.toEntity(utilisateur))
+                .build();
 
         return new ResponseEntity<>(idToken, HttpStatus.OK);
     }
