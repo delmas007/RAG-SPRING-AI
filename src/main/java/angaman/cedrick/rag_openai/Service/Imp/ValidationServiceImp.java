@@ -53,24 +53,19 @@ public class ValidationServiceImp implements ValidationService {
     @Transactional
     public void  enregistrerr(UtilisateurDto utilisateurDto) {
         Validation validation = new Validation();
-        System.out.println("Request received: " + 1);
         suppressionParUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
-        System.out.println("Request received: " + 2);
         validation.setUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
-        System.out.println("Request received: " + 3);
         Instant creation = Instant.now();
         Instant expiration = creation.plus((Duration.ofMinutes(10)));
         validation.setCreation(creation);
         validation.setExpiration(expiration);
 
         Random random = new Random();
-        System.out.println("Request received: " + 4);
         int randomCode = random.nextInt(999999);
         String code = String.format("%06d", randomCode);
 
         validation.setCode(code);
         validationRepository.save(validation);
-        System.out.println("Request received: " + 5);
         notificationMailServiceImp.sendNotificationMailMot(validation);
     }
 

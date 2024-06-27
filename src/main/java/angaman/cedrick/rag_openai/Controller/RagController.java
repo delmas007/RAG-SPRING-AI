@@ -52,6 +52,7 @@ public class RagController {
     public ResponseEntity<Map<String, String>> Connexion(@RequestBody Map<String, String> authentification) {
         String username = authentification.get("username");
         String password = authentification.get("password");
+        System.out.println("Request received: " + username + " " + password);
 
         return utilisateurServiceImp.Connexion(username, password);
     }

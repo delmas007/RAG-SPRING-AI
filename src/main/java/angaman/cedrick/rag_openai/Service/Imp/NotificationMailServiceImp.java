@@ -60,7 +60,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
 
             helper.setFrom("angamancedrick@gmail.com");
             helper.setTo(validation.getUtilisateur().getEmail());
-            helper.setSubject("Votre code d'activation");
+            helper.setSubject("Votre code de changement de mot de passe");
 
             String content = "<html>" +
                     "<body>" +
