@@ -16,4 +16,6 @@ public interface ValidationRepository extends JpaRepository<Validation, Integer>
     Optional<Validation> findByCode(@Param("code") String code);
 
     Optional<Validation> findByUtilisateur(Utilisateur utilisateur);
+
+    void deleteById(int id);
 }

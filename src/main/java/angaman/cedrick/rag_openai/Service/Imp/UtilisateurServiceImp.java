@@ -98,7 +98,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     }
     public int motDePasse(String username) {
         UtilisateurDto utilisateurDto = loadUserByUsername(username);
-        validationServiceImp.enregistrer(utilisateurDto);
+        validationServiceImp.enregistrerr(utilisateurDto);
         return 1;
     }
 

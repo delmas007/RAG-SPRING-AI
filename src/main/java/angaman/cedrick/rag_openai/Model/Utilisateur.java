@@ -51,6 +51,9 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur")
     private List<Jwt> jwts;
 
+    @OneToMany(mappedBy = "utilisateur")
+    private List<Validation> validations;
+
 
 
 

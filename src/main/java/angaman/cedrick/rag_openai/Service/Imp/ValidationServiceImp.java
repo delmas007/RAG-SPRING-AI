@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -48,6 +49,36 @@ public class ValidationServiceImp implements ValidationService {
         validation.setCode(code);
         validationRepository.save(validation);
         notificationMailServiceImp.sendNotificationMail(validation);
+    }
+    @Transactional
+    public void  enregistrerr(UtilisateurDto utilisateurDto) {
+        Validation validation = new Validation();
+        System.out.println("Request received: " + 1);
+        suppressionParUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
+        System.out.println("Request received: " + 2);
+        validation.setUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
+        System.out.println("Request received: " + 3);
+        Instant creation = Instant.now();
+        Instant expiration = creation.plus((Duration.ofMinutes(10)));
+        validation.setCreation(creation);
+        validation.setExpiration(expiration);
+
+        Random random = new Random();
+        System.out.println("Request received: " + 4);
+        int randomCode = random.nextInt(999999);
+        String code = String.format("%06d", randomCode);
+
+        validation.setCode(code);
+        validationRepository.save(validation);
+        System.out.println("Request received: " + 5);
+        notificationMailServiceImp.sendNotificationMailMot(validation);
+    }
+
+    public void suppressionParUtilisateur(Utilisateur utilisateur) {
+        Optional<Validation> validation = validationRepository.findByUtilisateur(utilisateur);
+        if (validation.isPresent()) {
+            validationRepository.deleteById(validation.get().getId());
+        }
     }
 
     @Override

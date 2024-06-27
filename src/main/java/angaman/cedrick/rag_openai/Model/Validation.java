@@ -27,7 +27,7 @@ public class Validation {
 
     private String code;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Utilisateur utilisateur;
 
 }
