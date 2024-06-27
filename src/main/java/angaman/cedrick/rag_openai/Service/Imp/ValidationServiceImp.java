@@ -10,6 +10,7 @@ import angaman.cedrick.rag_openai.Service.ValidationService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@Transactional
 public class ValidationServiceImp implements ValidationService {
 
     public ValidationServiceImp(ValidationRepository validationRepository, NotificationMailServiceImp notificationMailServiceImp) {
@@ -27,12 +29,9 @@ public class ValidationServiceImp implements ValidationService {
 
     final ValidationRepository validationRepository;
     private final NotificationMailServiceImp notificationMailServiceImp;
-    @PersistenceContext
-    private EntityManager entityManager;
 
 
     @Override
-    @Transactional
         public void  enregistrer(UtilisateurDto utilisateurDto) {
         Validation validation = new Validation();
         validation.setUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
@@ -50,7 +49,6 @@ public class ValidationServiceImp implements ValidationService {
         validationRepository.save(validation);
         notificationMailServiceImp.sendNotificationMail(validation);
     }
-    @Transactional
     public void  enregistrerr(UtilisateurDto utilisateurDto) {
         Validation validation = new Validation();
         suppressionParUtilisateur(UtilisateurDto.toEntity(utilisateurDto));
@@ -92,6 +90,11 @@ public class ValidationServiceImp implements ValidationService {
     public Validation lireEnFonctionDuCode(String code) {
         return this.validationRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Le code est invalide",
                 ErrorCodes.CODE_INVALIDE));
+    }
+
+    @Scheduled(cron = "0 */15 * * * *")
+    public void deleteAllByExpirationBefore() {
+        validationRepository.deleteAllByExpirationBefore(Instant.now());
     }
 
 }
