@@ -124,7 +124,6 @@ public class UtilisateurServiceImp implements UtilisateurService {
     }
 
     public UtilisateurDto emailSearch(String email) {
-        System.out.println(email);
         Optional<Utilisateur> user = utilisateurRepository.findByEmail(email);
         return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Email inexistant ",
                 ErrorCodes.EMAIL_PAS_TROUVER)));
