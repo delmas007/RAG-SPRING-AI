@@ -7,6 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 public enum ErrorCodes {
+    EMAIL_PAS_TROUVER(1200),
     UTILISATEUR_PAS_TROUVER(1100),
     UTILISATEUR_DEJA_EXIST(1000),
     CODE_INVALIDE(900),

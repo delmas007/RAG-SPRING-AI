@@ -97,7 +97,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
         return 1;
     }
     public int motDePasse(String username) {
-        UtilisateurDto utilisateurDto = loadUserByUsername(username);
+        UtilisateurDto utilisateurDto = emailSearch(username);
         validationServiceImp.enregistrerr(utilisateurDto);
         return 1;
     }
@@ -105,7 +105,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
     @Transactional
     public int NouveauMotDePasse(Map<String, String> donnees) {
         Validation validation = validationServiceImp.lireEnFonctionDuCode(donnees.get("code"));
-        UtilisateurDto utilisateurDto = loadUserByUsername(donnees.get("username"));
+        UtilisateurDto utilisateurDto = emailSearch(donnees.get("email"));
         Utilisateur entity = UtilisateurDto.toEntity(utilisateurDto);
 
         if(validation.getUtilisateur().getId().equals(entity.getId())){
@@ -122,6 +122,15 @@ public class UtilisateurServiceImp implements UtilisateurService {
         return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Utilisateur inexistant ",
                 ErrorCodes.UTILISATEUR_PAS_TROUVER)));
     }
+
+    public UtilisateurDto emailSearch(String email) {
+        System.out.println(email);
+        Optional<Utilisateur> user = utilisateurRepository.findByEmail(email);
+        return UtilisateurDto.fromEntity(user.orElseThrow(()-> new EntityNotFoundException("Email inexistant ",
+                ErrorCodes.EMAIL_PAS_TROUVER)));
+    }
+
+
 
     public Jwt tokenByValue(String value) {
         return jwtRepository.findByValueAndDesactiveAndExpire(

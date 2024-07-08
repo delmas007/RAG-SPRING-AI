@@ -72,7 +72,7 @@ public class RagController {
 
     @PostMapping("/modifierMotDePasse/")
     public int motDePasse(@RequestBody Map<String, String> username) {
-        String emaile = username.get("username");
+        String emaile = username.get("email");
 
         return utilisateurServiceImp.motDePasse(emaile);
     }
