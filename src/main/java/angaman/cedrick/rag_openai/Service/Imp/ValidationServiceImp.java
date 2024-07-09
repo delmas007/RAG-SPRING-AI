@@ -69,9 +69,7 @@ public class ValidationServiceImp implements ValidationService {
 
     public void suppressionParUtilisateur(Utilisateur utilisateur) {
         Optional<Validation> validation = validationRepository.findByUtilisateur(utilisateur);
-        if (validation.isPresent()) {
-            validationRepository.deleteById(validation.get().getId());
-        }
+        validation.ifPresent(value -> validationRepository.deleteById(value.getId()));
     }
 
     @Override

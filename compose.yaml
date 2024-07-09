@@ -1,6 +1,8 @@
+version: '3.8'
+
 services:
   postgres:
-    image : 'ankane/pgvector:v0.5.0'
+    image: 'ankane/pgvector:v0.5.0'
     restart: always
     environment:
       - POSTGRES_DB=vector_store
@@ -8,9 +10,9 @@ services:
       - POSTGRES_USER=postgres
       - PGPASSWORD=delmas
     logging:
-        options:
-            max-size: "10m"
-            max-file: "3"
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - '5431:5432'
     healthcheck:
@@ -18,23 +20,12 @@ services:
       interval: 2s
       timeout: 20s
       retries: 10
-  pgadmin:
-    container_name: pgadmin-container
-    image: 'dpage/pgadmin4:latest'
-    restart: always
-    environment:
-      - 'PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@pgadmin.com}'
-      - 'PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}'
-    volumes:
-      - '.servers.json:/pgadmin4/servers.json'
-    ports:
-        - '5050:80'
 
-  smtp4dev:
-    image: rnwood/smtp4dev:v3
-    restart: always
+
+  spring-app:
+    build: .
     ports:
-      # Change the number before : to the port the web interface should be accessible on
-      - '5081:80'
-      # Change the number before : to the port the SMTP server should be accessible on
-      - '9025:25'
+      - '7788:7788'
+    depends_on:
+      - postgres
+

@@ -43,7 +43,6 @@ public class RagController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/inscription/")
     public UtilisateurDto save(@RequestBody UtilisateurDto dto) {
-        System.out.println("Request received: " + dto);
         String role = "USER";
         return utilisateurServiceImp.Inscription(dto,role);
     }
@@ -52,7 +51,6 @@ public class RagController {
     public ResponseEntity<Map<String, String>> Connexion(@RequestBody Map<String, String> authentification) {
         String username = authentification.get("username");
         String password = authentification.get("password");
-        System.out.println("Request received: " + username + " " + password);
 
         return utilisateurServiceImp.Connexion(username, password);
     }
@@ -64,7 +62,6 @@ public class RagController {
 
     @PostMapping("/activation/")
     public int activation(@RequestBody Map<String, String> codes) {
-        System.out.println(codes);
         String code = codes.get("code");
 
         return utilisateurServiceImp.activation(code);
