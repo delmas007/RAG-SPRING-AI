@@ -34,11 +34,6 @@ public class RagController {
     AuthenticationManager authenticationManager;
     ResendMailImp resendMailImp;
 
-//    @GetMapping("/rag/")
-//    public ResponseEntity<String> rag(@RequestParam(name = "query") String query) {
-//        String response = ragServiceImp.askLlm(query);
-//        return ResponseEntity.ok(response);
-//    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/inscription/")
@@ -101,15 +96,6 @@ public class RagController {
                     .body(Map.of("error", "Erreur temporaire du serveur. Veuillez réessayer plus tard."));
         }
     }
-
-//    @GetMapping("/ragJson")
-//    public Map ragJson(@RequestParam(name = "query") String query) throws JsonProcessingException {
-//        String reponse = ragServiceImp.askLlm(query);
-//        return new ObjectMapper().readValue(reponse, Map.class);
-//    }
-
-
-
     @PostMapping(value = "/fichier/.pdf")
     public ResponseEntity<Void> textEmbeddingsPdf(
             @RequestParam("files") MultipartFile[] pdfFiles,
@@ -213,28 +199,4 @@ public class RagController {
         return ragServiceImp.Image(prompt);
     }
 
-
-//    @PostMapping("/fichier/word")
-//    public ResponseEntity<Void> textEmbeddingsWord(@RequestParam("files") Resource[] worldResources) {
-//        ragServiceImp.textEmbeddingWord(worldResources);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    @PostMapping("/fichier/excel")
-//    public ResponseEntity<Void> textEmbeddingsExcel(@RequestParam("files") Resource[] excelResources) {
-//        ragServiceImp.textEmbeddingExcel(excelResources);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    @PostMapping("/fichier/powerpoint")
-//    public ResponseEntity<Void> textEmbeddingsPowerpoint(@RequestParam("files") Resource[] powerpointlResources) {
-//        ragServiceImp.textEmbeddingPowerpoint(powerpointlResources);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    @PostMapping("/fichier/pdf")
-//    public ResponseEntity<Void> textEmbeddingsPdf(@RequestParam("files") Resource[] pdfResources) {
-//        ragServiceImp.textEmbeddingPdf(pdfResources);
-//        return ResponseEntity.ok().build();
-//    }
 }

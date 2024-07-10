@@ -14,10 +14,13 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:4200"); // Ajoutez l'URL de votre application Angular
+        config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedOrigin("http://angular-app:4200"); // Utilisation de "angular-app" ici
+//        config.addAllowedOrigin("*"); // Utilisation de "angular-app" ici
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 }
+
