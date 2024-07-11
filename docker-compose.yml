@@ -16,8 +16,9 @@ services:
       interval: 2s
       timeout: 20s
       retries: 10
-#    networks:
-#      - my-network
+    networks:
+      - my-network
+    container_name: postgres
 
   spring-app:
     build: .
@@ -25,18 +26,25 @@ services:
       - '7788:7788'
     depends_on:
       - postgres
-#    networks:
-#      - my-network
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7788/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    container_name: spring-app
 
-#  angular-app:
-#    image: rag-front
-#    ports:
-#      - '4200:4200'
-#    depends_on:
-#      - spring-app
-#    networks:
-#      - my-network
+  angular-app:
+    image: rag-front
+    ports:
+      - '4200:4200'
+    depends_on:
+      - spring-app
+    networks:
+      - my-network
+    container_name: angular-app
 
-#networks:
-#  my-network:
-#    driver: bridge
+networks:
+  my-network:
+    driver: bridge
