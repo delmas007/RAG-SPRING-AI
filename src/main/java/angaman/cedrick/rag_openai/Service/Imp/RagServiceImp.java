@@ -79,7 +79,7 @@ public class RagServiceImp implements RagService {
 
         String systemMessageTemplate = """
                 Vous devez répondre à la question suivante en vous basant uniquement sur le CONTEXTE fourni ci-dessous. Ne fournissez aucune information qui n'est pas contenue dans ce contexte.
-                
+
                 Votre tâche est de :
                 - Utiliser uniquement le CONTEXTE pour élaborer votre réponse.
                 - Ne pas faire de suppositions ou ajouter des informations qui ne sont pas dans le CONTEXTE.
@@ -90,6 +90,12 @@ public class RagServiceImp implements RagService {
 
                 Notez que votre réponse doit être bien organiser respecte les retour a la ligne, précise, concise, et axée sur la question.\s
                 """;
+//        String systemMessageTemplate = """
+//                Vous devez répondre à la question en te basant sur le contexte
+//
+//                CONTEXTE:
+//                    {CONTEXTE}
+//                """;
         Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
                 .createMessage(Map.of("CONTEXTE",allResults));
         UserMessage userMessage = new UserMessage(query);
