@@ -162,7 +162,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
         JwtClaimsSet jwtClaimsSet=JwtClaimsSet.builder()
                 .subject(subject)
                 .issuedAt(instant)
-                .expiresAt(instant.plus((Duration.ofMinutes(10))))
+                .expiresAt(instant.plus((Duration.ofMinutes(30))))
                 .issuer("security-service")
                 .claim("scope",scope)
                 .claim("nom",nom)
