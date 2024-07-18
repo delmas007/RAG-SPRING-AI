@@ -11,11 +11,6 @@ services:
       - PGPASSWORD=${SPRING_DATASOURCE_PASSWORD}
     ports:
       - '5431:5432'
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME} -d vector_store"]
-      interval: 2s
-      timeout: 20s
-      retries: 10
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -23,7 +18,8 @@ services:
     container_name: postgres
 
   spring-app:
-    image: rag-back
+#    image: rag-back
+    image: delmas007/rag-back
     ports:
       - '7788:7788'
     depends_on:
@@ -59,7 +55,8 @@ services:
 
 
   angular-app:
-    image: rag-front
+    image: delmas007/rag-front
+#    image: rag-front
     ports:
       - '4200:4200'
     depends_on:
