@@ -40,7 +40,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
                     "                </div>" +
                     "                Si vous n'avez pas demandé ce code, veuillez ignorer cet e-mail ou nous contacter." +
                     "            </div>" +
-                    "            <div style=\"background-color: #f7f7f7; color: #666666; text-align: center; padding: 12px 20px; font-size: 14px;\">© 2024 Votre Entreprise Tous droits réservés.</div>" +
+                    "            <div style=\"background-color: #f7f7f7; color: #666666; text-align: center; padding: 12px 20px; font-size: 14px;\">© 2024 Angaman Cedrick Tous droits réservés.</div>" +
                     "        </div>" +
                     "    </div>" +
                     "</body>" +
@@ -75,7 +75,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
                     "                </div>" +
                     "                Si vous n'avez pas demandé ce code, veuillez ignorer cet e-mail ou nous contacter." +
                     "            </div>" +
-                    "            <div style=\"background-color: #f7f7f7; color: #666666; text-align: center; padding: 12px 20px; font-size: 14px;\">© 2024 Votre Entreprise Tous droits réservés.</div>" +
+                    "            <div style=\"background-color: #f7f7f7; color: #666666; text-align: center; padding: 12px 20px; font-size: 14px;\">© 2024 Angaman Cedrick Tous droits réservés.</div>" +
                     "        </div>" +
                     "    </div>" +
                     "</body>" +

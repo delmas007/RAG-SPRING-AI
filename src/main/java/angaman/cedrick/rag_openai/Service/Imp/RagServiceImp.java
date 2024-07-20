@@ -105,7 +105,7 @@ public class RagServiceImp implements RagService {
 //                .withModel("gpt-4-turbo-preview")
                 .withModel("gpt-4o")
                 .withTemperature(0F)
-                .withMaxTokens(1500)
+                .withMaxTokens(3000)
                 .build();
         OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
