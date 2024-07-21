@@ -19,7 +19,7 @@ services:
 
   spring-app:
 #    image: rag-back
-    image: delmas007/rag-back
+    image: delmas007/rag-back:v2.0
     ports:
       - '7788:7788'
     depends_on:
@@ -55,7 +55,7 @@ services:
 
 
   angular-app:
-    image: delmas007/rag-front
+    image: delmas007/rag-front:v2.0
 #    image: rag-front
     ports:
       - '4200:4200'
