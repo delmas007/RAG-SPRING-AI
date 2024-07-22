@@ -16,6 +16,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://angular-app:4200");
         config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedOrigin("https://rag-front-v2-0.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
