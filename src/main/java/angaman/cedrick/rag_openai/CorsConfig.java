@@ -14,9 +14,7 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://angular-app:4200");
-        config.addAllowedOrigin("http://localhost:4200");
-        config.addAllowedOrigin("https://rag-front-v2-0.onrender.com");
+        config.addAllowedOrigin("https://rag-front-v3-0.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
