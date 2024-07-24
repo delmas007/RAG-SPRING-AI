@@ -111,6 +111,7 @@ public class UtilisateurServiceImp implements UtilisateurService {
         if(validation.getUtilisateur().getId().equals(entity.getId())){
             String mdpCrypte = passwordEncoder.encode(donnees.get("password"));
             entity.setPassword(mdpCrypte);
+            entityManager.merge(entity);
             return 1;
         }
         return 1;
