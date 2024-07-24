@@ -23,7 +23,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
             MimeMessage mail = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mail, true);
 
-            helper.setFrom("angamancedrick@gmail.com");
+            helper.setFrom("noreply@delmas-gpt.tech");
             helper.setTo(validation.getUtilisateur().getEmail());
             helper.setSubject("Votre code d'activation");
 
@@ -58,7 +58,7 @@ public class NotificationMailServiceImp implements NotificationMailService {
             MimeMessage mail = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mail, true);
 
-            helper.setFrom("angamancedrick@gmail.com");
+            helper.setFrom("noreply@delmas-gpt.tech");
             helper.setTo(validation.getUtilisateur().getEmail());
             helper.setSubject("Votre code de changement de mot de passe");
 
