@@ -7,8 +7,6 @@ import angaman.cedrick.rag_openai.Model.Utilisateur;
 import angaman.cedrick.rag_openai.Model.Validation;
 import angaman.cedrick.rag_openai.Repository.ValidationRepository;
 import angaman.cedrick.rag_openai.Service.ValidationService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -39,9 +37,7 @@ public class ValidationServiceImp implements ValidationService {
         Instant expiration = creation.plus((Duration.ofMinutes(10)));
         validation.setCreation(creation);
         validation.setExpiration(expiration);
-
         Random random = new Random();
-
         int randomCode = random.nextInt(999999);
         String code = String.format("%06d", randomCode);
 
@@ -81,8 +77,6 @@ public class ValidationServiceImp implements ValidationService {
         validation.setCode(code);
         validationRepository.save(validation);
         notificationMailServiceImp.sendNotificationMail(validation);
-
-
     }
 
     public Validation lireEnFonctionDuCode(String code) {

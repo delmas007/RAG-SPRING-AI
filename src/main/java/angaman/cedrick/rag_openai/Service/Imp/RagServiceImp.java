@@ -8,17 +8,17 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xslf.usermodel.*;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.ai.openai.OpenAiChatClient;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -63,10 +63,8 @@ public class RagServiceImp implements RagService {
 
         List<Document> allResults = vectorStore.similaritySearch(SearchRequest.query(query).withTopK(30));
 
-//         Récupérer l'ID de l'utilisateur
         String utilisateurId = utilisateur.getId();
 
-//         Filtrer les résultats pour inclure uniquement les documents liés à l'utilisateur spécifié
         allResults = allResults.stream()
                 .filter(doc -> {
                     Optional<String> vectorStoreUserIdOpt = vectorRepository.findUserIdByVectorStoreId(doc.getId());
@@ -90,24 +88,18 @@ public class RagServiceImp implements RagService {
 
                 Notez que votre réponse doit être bien organiser respecte les retour a la ligne, précise, concise, et axée sur la question.\s
                 """;
-//        String systemMessageTemplate = """
-//                Vous devez répondre à la question en te basant sur le contexte
-//
-//                CONTEXTE:
-//                    {CONTEXTE}
-//                """;
+
         Message systemMessage = new SystemPromptTemplate(systemMessageTemplate)
                 .createMessage(Map.of("CONTEXTE",allResults));
         UserMessage userMessage = new UserMessage(query);
         Prompt prompt = new Prompt(List.of(systemMessage,userMessage));
         OpenAiApi aiApi = new OpenAiApi(apiKey);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-//                .withModel("gpt-4-turbo-preview")
                 .withModel("gpt-4o")
-                .withTemperature(0F)
+                .withTemperature(0.0)
                 .withMaxTokens(3000)
                 .build();
-        OpenAiChatClient openAiChatClient = new OpenAiChatClient(aiApi, openAiChatOptions);
+        OpenAiChatModel openAiChatClient = new OpenAiChatModel(aiApi, openAiChatOptions);
         ChatResponse response = openAiChatClient.call(prompt);
         String responseContent = response.getResult().getOutput().getContent();
        return responseContent;
@@ -118,19 +110,23 @@ public class RagServiceImp implements RagService {
     public void textEmbeddingPdf(Resource[] pdfResources, UtilisateurDto utilisateur) {
         vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.defaultConfig();
-        String content = "";
+//        String content = "";
+        List<Document> documentList = List.of();
         for(Resource resource : pdfResources){
             PagePdfDocumentReader pagePdfDocumentReader = new PagePdfDocumentReader(resource,config);
-            List<Document> documentList = pagePdfDocumentReader.get();
-            content += documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"))+"\n";
+            documentList = pagePdfDocumentReader.get();
+//            content += documentList.stream().map(d -> d.getContent()).collect(Collectors.joining("\n"))+"\n";
         }
 
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-        List<String> chunks = tokenTextSplitter.split(content,1000);
-        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
+        List<Document> chunks = tokenTextSplitter.split(documentList);
+//        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+        vectorStore.accept(chunks);
 
-        for (Document doc : chunksDocs) {
+//        for (Document doc : chunksDocs) {
+//            vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
+//        }
+        for (Document doc : chunks) {
             vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
         }
 
@@ -139,26 +135,26 @@ public class RagServiceImp implements RagService {
 
     @Override
     public void textEmbeddingWord(Resource[] worldResources,UtilisateurDto utilisateur) {
-//        jdbcTemplate.update("delete from vector_store");
        vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
+        List<Document> documentList = List.of();
         for(Resource resource : worldResources){
             try (InputStream inputStream = resource.getInputStream()) {
                 XWPFDocument document = new XWPFDocument(inputStream);
                 XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+                documentList = List.of(new Document(extractor.getText()));
                 content += extractor.getText();
             } catch (IOException e) {
-                // Gérer l'erreur d'une manière appropriée
                 e.printStackTrace();
             }
         }
 
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-        List<String> chunks = tokenTextSplitter.split(content,1000);
-        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
+        List<Document> chunks = tokenTextSplitter.split(documentList);
+//        List<Document> chunksDocs = chunks.stream().map(chunk -> new Document(chunk)).collect(Collectors.toList());
+        vectorStore.accept(chunks);
 
-        for (Document doc : chunksDocs) {
+        for (Document doc : chunks) {
             vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
         }
     }
@@ -169,34 +165,59 @@ public class RagServiceImp implements RagService {
     public void textEmbeddingExcel(Resource[] excelResources,UtilisateurDto utilisateur) {
         vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
-        for(Resource resource : excelResources){
+        List<Document> documentList = List.of();
+        for (Resource resource : excelResources) {
             try (InputStream inputStream = resource.getInputStream()) {
                 Workbook workbook = WorkbookFactory.create(inputStream);
                 int numberOfSheets = workbook.getNumberOfSheets();
+
                 for (int i = 0; i < numberOfSheets; i++) {
                     Sheet sheet = workbook.getSheetAt(i);
                     Iterator<Row> rowIterator = sheet.iterator();
-                    while (((Iterator<?>) rowIterator).hasNext()) {
+
+                    while (rowIterator.hasNext()) {
                         Row row = rowIterator.next();
+                        StringBuilder rowContent = new StringBuilder();
+
                         Iterator<Cell> cellIterator = row.cellIterator();
                         while (cellIterator.hasNext()) {
                             Cell cell = cellIterator.next();
-                            content += cell.toString() + " ";
+                            rowContent.append(cell.toString()).append(" ");
                         }
-                        content += "\n";
+                        documentList.add(new Document(rowContent.toString().trim()));
                     }
                 }
             } catch (IOException e) {
-                // Gérer l'erreur d'une manière appropriée
                 e.printStackTrace();
             }
         }
+//        for(Resource resource : excelResources){
+//            try (InputStream inputStream = resource.getInputStream()) {
+//                Workbook workbook = WorkbookFactory.create(inputStream);
+//                int numberOfSheets = workbook.getNumberOfSheets();
+//                for (int i = 0; i < numberOfSheets; i++) {
+//                    Sheet sheet = workbook.getSheetAt(i);
+//                    Iterator<Row> rowIterator = sheet.iterator();
+//                    while (((Iterator<?>) rowIterator).hasNext()) {
+//                        Row row = rowIterator.next();
+//                        Iterator<Cell> cellIterator = row.cellIterator();
+//                        while (cellIterator.hasNext()) {
+//                            Cell cell = cellIterator.next();
+//                            content += cell.toString() + " ";
+//                        }
+//                        content += "\n";
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-        List<String> chunks = tokenTextSplitter.split(content, 1000);
-        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
-        for (Document doc : chunksDocs) {
+        List<Document> chunks = tokenTextSplitter.split(documentList);
+//        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+        vectorStore.accept(chunks);
+        for (Document doc : chunks) {
             vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
         }
     }
@@ -207,30 +228,54 @@ public class RagServiceImp implements RagService {
     public void textEmbeddingPowerpoint(Resource[] PowerpointResources,UtilisateurDto utilisateur) {
         vectorRepository.supprimerParUtilisateurId(utilisateur.getId());
         String content = "";
+        List<Document> documentList = List.of();
         for (Resource resource : PowerpointResources) {
             try (InputStream inputStream = resource.getInputStream()) {
                 XMLSlideShow ppt = new XMLSlideShow(inputStream);
+
                 for (XSLFSlide slide : ppt.getSlides()) {
+                    StringBuilder slideContent = new StringBuilder();
+
                     for (XSLFShape shape : slide.getShapes()) {
                         if (shape instanceof XSLFTextShape) {
                             XSLFTextShape textShape = (XSLFTextShape) shape;
                             for (XSLFTextParagraph paragraph : textShape) {
-                                content += paragraph.getText() + "\n";
+                                slideContent.append(paragraph.getText()).append("\n");
                             }
                         }
                     }
+                    if (slideContent.length() > 0) {
+                        documentList.add(new Document(slideContent.toString().trim()));
+                    }
                 }
             } catch (IOException e) {
-                // Gérer l'erreur d'une manière appropriée
                 e.printStackTrace();
             }
         }
+//        for (Resource resource : PowerpointResources) {
+//            try (InputStream inputStream = resource.getInputStream()) {
+//                XMLSlideShow ppt = new XMLSlideShow(inputStream);
+//                for (XSLFSlide slide : ppt.getSlides()) {
+//                    for (XSLFShape shape : slide.getShapes()) {
+//                        if (shape instanceof XSLFTextShape) {
+//                            XSLFTextShape textShape = (XSLFTextShape) shape;
+//                            for (XSLFTextParagraph paragraph : textShape) {
+//                                content += paragraph.getText() + "\n";
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                // Gérer l'erreur d'une manière appropriée
+//                e.printStackTrace();
+//            }
+//        }
 
         TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
-        List<String> chunks = tokenTextSplitter.split(content, 1000);
-        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
-        vectorStore.accept(chunksDocs);
-        for (Document doc : chunksDocs) {
+        List<Document> chunks = tokenTextSplitter.split(documentList);
+//        List<Document> chunksDocs = chunks.stream().map(Document::new).collect(Collectors.toList());
+        vectorStore.accept(chunks);
+        for (Document doc : chunks) {
             vectorRepository.updateUserForVector(utilisateur.getId(), doc.getId());
         }
     }
@@ -238,7 +283,7 @@ public class RagServiceImp implements RagService {
     @Override
     public String Image(String prompt) {
         OpenAiImageApi api = new OpenAiImageApi(apiKey);
-        OpenAiImageClient openaiImageClient = new OpenAiImageClient(api);
+        OpenAiImageModel openaiImageClient = new OpenAiImageModel(api);
 
         ImageResponse response = openaiImageClient.call(
                 new ImagePrompt(prompt,
@@ -253,21 +298,20 @@ public class RagServiceImp implements RagService {
     }
 
     public void textEmbeddingTxt(Resource[] txtResources) {
-        jdbcTemplate.update("delete from vector_store"); // Effacer l'ancien contenu
+        jdbcTemplate.update("delete from vector_store");
         StringBuilder content = new StringBuilder();
 
-        // Lire le contenu des fichiers TXT
         for (Resource resource : txtResources) {
             try (InputStream inputStream = resource.getInputStream();
                  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
                 String line;
-                while ((line = reader.readLine()) != null) { // Lire ligne par ligne
-                    content.append(line).append("\n"); // Ajouter au contenu
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
                 }
 
             } catch (IOException e) {
-                e.printStackTrace(); // Gérer l'erreur de lecture du fichier
+                e.printStackTrace();
             }
         }
     }

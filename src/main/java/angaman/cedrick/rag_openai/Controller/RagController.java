@@ -58,20 +58,17 @@ public class RagController {
     @PostMapping("/activation/")
     public int activation(@RequestBody Map<String, String> codes) {
         String code = codes.get("code");
-
         return utilisateurServiceImp.activation(code);
     }
 
     @PostMapping("/modifierMotDePasse/")
     public int motDePasse(@RequestBody Map<String, String> username) {
         String emaile = username.get("email");
-
         return utilisateurServiceImp.motDePasse(emaile);
     }
 
     @PostMapping("/NouveauMotDePasse/")
     public int NouveauMotDePasse(@RequestBody Map<String, String> donnees) {
-
         return utilisateurServiceImp.NouveauMotDePasse(donnees);
     }
 

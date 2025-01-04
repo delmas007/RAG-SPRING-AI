@@ -14,5 +14,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    // Ajoutez d'autres gestionnaires d'exception ici pour d'autres types d'erreurs
 }
